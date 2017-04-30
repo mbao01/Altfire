@@ -1,0 +1,119 @@
+<ion-header no-padding>
+
+    <ion-navbar>
+        <ion-buttons left menuToggle>
+            <button ion-button icon-only>
+                <ion-icon name="menu"></ion-icon>
+            </button>
+        </ion-buttons>
+        <ion-title text-center>GraphQL API Client</ion-title>
+        <ion-buttons right>
+            <button ion-button icon-only (click)="presentPopover($event)">
+                <ion-icon name="more"></ion-icon>
+            </button>
+        </ion-buttons>
+        <span item-right [class]="(user && user?.uid && user?.tokenValid) ? 'login-state' : ''"></span>
+    </ion-navbar>
+
+    <ion-toolbar no-border no-padding>
+        <ion-segment style="margin-bottom: -14px" [(ngModel)]="segment">
+            <ion-segment-button value="home">
+                <ion-icon name="camera" ></ion-icon>
+            </ion-segment-button>
+            <ion-segment-button value="headers">
+                <ion-icon name="bookmark"></ion-icon>
+                <ion-badge item-right color="{{ (header_detail[1] && graph?.headers[0].key != '')  ? 'secondary' : 'danger' }}" style="position: absolute; top: 0; right: 0; padding: 3px 5px;" *ngIf="graph?.headers[0].key">{{ header_detail[0] }}</ion-badge>
+            </ion-segment-button>
+            <ion-segment-button value="summary">
+                <ion-icon name="list"></ion-icon>
+            </ion-segment-button>
+        </ion-segment>
+    </ion-toolbar>
+</ion-header>
+
+
+<ion-content scrollbar-y-auto>
+    <ion-grid no-padding no-margin *ngIf="segment == 'home'">
+        <ion-list no-padding no-margin>
+            <ion-row no-padding style="background: lightblue" full>
+                <ion-col no-margin>
+                    <ion-input type="text" placeholder="Enter API endpoint" [ngStyle]="{'background': (graph?.endpoint && endpoint_set) ? 'green' : (endpoint_set) ? 'red' : 'transparent' }" (blur)="onSetEndpoint(endpoint)" [(ngModel)]="endpoint"></ion-input>
+                </ion-col>
+            </ion-row>
+        </ion-list>
+
+        <ion-grid *ngIf="state != 'response'">
+            <ion-row>
+                <ion-col>
+                    <textarea [placeholder]="bareminimun" (blur)="graph.endpoint ? onSetQuery(query) : ''" [(ngModel)]="query"></textarea>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+
+        <ion-grid *ngIf="state == 'response'">
+            <ion-row>
+                <ion-col text-center>
+                    <code><textarea readonly>{{ graph?.response ? (graph?.response | json) : '' }}</textarea></code>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+    </ion-grid>
+
+    <ion-fab bottom right>
+        <button ion-fab mini (click)="onSendQuery()"><ion-icon name="play"></ion-icon></button>
+    </ion-fab>
+    <ion-fab bottom left>
+        <button ion-fab mini (click)="state != '' ? onToggleState(state) : ''"><ion-icon [name]="state == 'query' ? 'arrow-forward' : state == 'response' ? 'arrow-back' : 'remove-circle'"></ion-icon></button>
+    </ion-fab>
+
+    <ion-grid no-padding *ngIf="segment == 'headers'">
+        <ion-list no-lines *ngFor="let header of graph.headers, let i=index">
+            <request-header (headerEvent)="onSetHeaders($event, i);" (delete)="onDeleteHeader(i)" [headerProperty]="header"></request-header>
+        </ion-list>
+        <ion-row>
+            <ion-col>
+                <ion-buttons>
+                    <button ion-button icon-right full block small (click)="onAddNewHeader()">
+                        Add Header
+                        <ion-icon name="add"></ion-icon>
+                    </button>
+                </ion-buttons>
+            </ion-col>
+            <ion-col col-4>
+                <ion-buttons>
+                    <button ion-button full block small clear>
+                        Bulk Edit
+                    </button>
+                </ion-buttons>
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+
+    <ion-grid *ngIf="segment == 'summary'" class="summary">
+        <ion-row no-padding no-margin no-border *ngIf="graph.response">
+            <ion-item-group>
+                <ion-item-divider color="light">{{ graph.query_type | uppercase}}</ion-item-divider>
+                <ion-item>{{ graph.endpoint }}</ion-item>
+            </ion-item-group>
+            <ion-item-group>
+                <ion-item-divider color="light" *ngIf="graph.headers">Header</ion-item-divider>
+                <ion-item *ngFor="let header of graph.headers">
+                    <ion-col col-4>{{ header.key }}</ion-col>
+                    <ion-col col-8>{{ header.value }}</ion-col>
+                </ion-item>
+            </ion-item-group>
+            <ion-item-group *ngIf="graph?.response && response_valid">
+                <ion-item-divider color="secondary"> Response </ion-item-divider>
+                <ion-col>
+                    <code><ion-textarea readonly value="{{ graph?.response ? (graph?.response | json) : '' }}"></ion-textarea></code>
+                </ion-col>
+            </ion-item-group>
+        </ion-row>
+
+        <ion-row *ngIf="!graph.response">
+            No Graph Response
+        </ion-row>
+
+    </ion-grid>
+
+</ion-content>

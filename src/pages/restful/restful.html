@@ -1,0 +1,197 @@
+<ion-header no-padding>
+
+    <ion-navbar>
+        <ion-buttons left menuToggle>
+            <button ion-button icon-only>
+                <ion-icon name="menu"></ion-icon>
+            </button>
+        </ion-buttons>
+        <ion-title text-center>RESTful API Client</ion-title>
+        <ion-buttons right>
+            <button ion-button icon-only (click)="presentPopover($event)">
+                <ion-icon name="more"></ion-icon>
+            </button>
+        </ion-buttons>
+        <span item-right [class]="(user && user?.uid && user?.tokenValid) ? 'login-state' : ''"></span>
+    </ion-navbar>
+
+    <ion-toolbar no-border no-padding>
+        <ion-segment style="margin-bottom: -14px" [(ngModel)]="segment">
+            <ion-segment-button value="home">
+                <ion-icon name="camera"></ion-icon>
+            </ion-segment-button>
+            <ion-segment-button value="headers">
+                <ion-icon name="bookmark"></ion-icon>
+                <ion-badge item-right color="{{ (request_header_detail[1] && rest?.request_header && rest?.request_header[0].key != '')  ? 'secondary' : 'danger' }}" style="position: absolute; top: 0; right: 0; padding: 3px 5px;" *ngIf="rest?.request_header[0].key">{{ request_header_detail[0] }}</ion-badge>
+            </ion-segment-button>
+            <ion-segment-button value="body" [disabled]="rest.request_type == 'get'">
+                <ion-icon name="book"></ion-icon>
+                <ion-badge item-right color="{{ (request_body_detail[1]  && rest?.request_body && rest?.request_body[0].key != '') ? 'secondary' : 'danger' }}" style="position: absolute; top: 0; right: 0; padding: 3px 5px;" *ngIf="rest?.request_body[0].key">{{ request_body_detail[0] }}</ion-badge>
+            </ion-segment-button>
+            <ion-segment-button value="authorization">
+                <ion-icon name="cog"></ion-icon>
+                <ion-badge item-right color="secondary" style="position: absolute; top: 0; right: 0; padding: 3px 5px;" *ngIf="request_auth_set">*</ion-badge>
+            </ion-segment-button>
+            <ion-segment-button value="summary">
+                <ion-icon name="list"></ion-icon>
+            </ion-segment-button>
+        </ion-segment>
+    </ion-toolbar>
+
+</ion-header>
+
+
+<ion-content scrollbar-y-auto>
+
+    <ion-grid no-padding no-margin *ngIf="segment == 'home'">
+        <ion-list no-padding no-margin>
+            <ion-row no-padding style="background: lightblue" full>
+                <ion-col col-3 no-margin>
+                    <button ion-button full icon-right no-padding (click)="showOptions()">
+                        {{ rest.request_type | uppercase }}
+                        <ion-icon name="arrow-dropdown"></ion-icon>
+                    </button>
+                </ion-col>
+                <ion-col col-9 no-margin>
+                    <ion-input type="text" placeholder="Enter request URL" (blur)="onSetUrl(request_url)" [(ngModel)]="request_url"></ion-input>
+                </ion-col>
+            </ion-row>
+        </ion-list>
+
+        <ion-row>
+            <ion-col>
+                <code><textarea [placeholder]="bareminimun" [ngStyle]="{'background': (rest?.response && response_valid) ? 'green' : rest?.response ? 'red' : '' }" readonly>{{ rest?.response ? (rest?.response | json) : '' }}</textarea></code>
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+
+    <ion-fab bottom right (click)="onSendRequest()">
+        <button ion-fab mini>
+            <ion-icon name="play"></ion-icon>
+        </button>
+    </ion-fab>
+
+    <ion-grid no-padding no-margin *ngIf="segment == 'headers'">
+        <ion-list no-lines *ngFor="let header of rest.request_header, let i=index">
+            <request-header (headerEvent)="onSetHeaders($event, i);" (delete)="onDeleteHeader(i)" [headerProperty]="header"></request-header>
+        </ion-list>
+        <ion-row>
+            <ion-col col-8>
+                <ion-buttons>
+                    <button ion-button icon-right full no-padding small (click)="onAddNewHeader()">
+                        Add Header
+                        <ion-icon name="add"></ion-icon>
+                    </button>
+                </ion-buttons>
+            </ion-col>
+            <ion-col col-4>
+                <ion-buttons>
+                    <button ion-button full no-padding small clear>
+                        Bulk Edit
+                    </button>
+                </ion-buttons>
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+
+    <ion-grid no-lines no-padding *ngIf="segment == 'body'">
+        <ion-row radio-group (ionChange)="onSetBodyType($event)" [ngModel]="rest.request_body_type">
+            <ion-col col-4 no-padding no-margin>
+                <ion-item no-padding no-margin>
+                    <ion-label style="font-size: 10px;" text-center>form-data</ion-label>
+                    <ion-radio value="form_data"></ion-radio>
+                </ion-item>
+            </ion-col>
+            <ion-col col-4 no-padding no-margin>
+                <ion-item no-padding no-margin>
+                    <ion-label style="font-size: 10px;" text-center>x-www-form-urlencoded</ion-label>
+                    <ion-radio value="form_urlencoded"></ion-radio>
+                </ion-item>
+            </ion-col>
+            <ion-col col-4 no-padding no-margin>
+                <ion-item no-padding no-margin>
+                    <ion-label style="font-size: 10px;" text-center>raw</ion-label>
+                    <ion-radio value="raw"></ion-radio>
+                </ion-item>
+            </ion-col>
+        </ion-row>
+        <ion-list no-lines no-margin *ngFor="let body of rest.request_body, let i=index">
+            <request-body (bodyEvent)="onSetBody($event, i);" (delete)="onDeleteBody(i)" [bodyProperty]="body"></request-body>
+        </ion-list>
+        <ion-row>
+            <ion-col>
+                <ion-buttons>
+                    <button ion-button icon-right full block small (click)="onAddNewBody()">
+                        Add Body
+                        <ion-icon name="add"></ion-icon>
+                    </button>
+                </ion-buttons>
+            </ion-col>
+            <ion-col col-4>
+                <ion-buttons>
+                    <button ion-button full block small clear>
+                        Bulk Edit
+                    </button>
+                </ion-buttons>
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+
+    <ion-grid no-lines *ngIf="segment == 'authorization'">
+        <ion-row  no-padding no-margin>
+            <ion-col no-padding no-margin>
+                <ion-item no-padding no-margin>
+                    <ion-label>Type</ion-label>
+                    <ion-select [(ngModel)]="rest.request_authorization_type">
+                        <ion-option value="no_auth" selected="true">No Auth</ion-option>
+                        <ion-option value="auth_basic">Basic Auth</ion-option>
+                        <ion-option value="auth_digest">Digest Auth</ion-option>
+                        <ion-option value="auth1">OAuth 1.0</ion-option>
+                        <ion-option value="auth2">OAuth 2.0</ion-option>
+                        <ion-option value="auth_hawk">Hawk Authentication</ion-option>
+                        <ion-option value="auth_aws">AWS Signature</ion-option>
+                    </ion-select>
+                </ion-item>
+            </ion-col>
+        </ion-row>
+        <!--<request-authorization></request-authorization>-->
+    </ion-grid>
+
+    <ion-grid no-lines *ngIf="segment == 'summary'" class="summary">
+        <ion-row no-padding no-margin no-border *ngIf="rest.response">
+            <ion-item-group>
+                <ion-item-divider color="light">{{ rest.request_type | uppercase}}</ion-item-divider>
+                <ion-item>{{ rest.request_url }}</ion-item>
+            </ion-item-group>
+            <ion-item-group>
+                <ion-item-divider color="light" *ngIf="rest.request_header">Header</ion-item-divider>
+                <ion-item *ngFor="let header of rest.request_header">
+                    <ion-col col-4>{{ header.key }}</ion-col>
+                    <ion-col col-8>{{ header.value }}</ion-col>
+                </ion-item>
+            </ion-item-group>
+            <ion-item-group *ngIf="rest.request_body && rest.request_type != 'get'">
+                <ion-item-divider color="light">Body: &nbsp;&nbsp;&nbsp;{{ rest.request_body_type }}</ion-item-divider>
+                <ion-item *ngFor="let body of rest.request_body">
+                    <ion-col col-4>{{ body.key }}</ion-col>
+                    <ion-col col-8>{{ body.value }}</ion-col>
+                </ion-item>
+            </ion-item-group>
+            <ion-item-group>
+                <ion-item-divider color="light">Authentication: &nbsp;&nbsp;&nbsp;{{ rest.request_authorization_type | uppercase }}</ion-item-divider>
+            </ion-item-group>
+            <ion-item-group *ngIf="rest?.response">
+                <ion-item-divider color="secondary"> Response </ion-item-divider>
+                <ion-col>
+                    <code><ion-textarea readonly value="{{ rest?.response ? (rest?.response | json) : '' }}"></ion-textarea></code>
+                </ion-col>
+            </ion-item-group>
+        </ion-row>
+
+        <ion-row *ngIf="!rest.response">
+            No REST Response
+        </ion-row>
+
+    </ion-grid>
+
+</ion-content>

@@ -1,0 +1,26 @@
+<ion-menu [content]="nav">
+    <ion-content scrollbar-y-auto>
+        <ion-grid>
+            <ion-list>
+
+                <button ion-item detail-none>
+                    <ion-icon name="cog" item-left></ion-icon>
+                    Settings
+                </button>
+
+                <button ion-item detail-none>
+                    <ion-icon name="book" item-left></ion-icon>
+                    Saved Items
+                </button>
+
+                <button ion-item detail-none>
+                    <ion-icon name="cog" item-left></ion-icon>
+                    Reset App
+                </button>
+
+            </ion-list>
+        </ion-grid>
+    </ion-content>
+</ion-menu>
+
+<ion-nav #nav></ion-nav>

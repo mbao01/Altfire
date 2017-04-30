@@ -1,0 +1,51 @@
+page-graphql {
+  .scroll {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+  textarea {
+    resize: none;
+    width: 100%;
+    border: none;
+    height: 400px;
+    background: #fdfdfd;
+  }
+
+  .colorify {
+    pre {
+      font-size: 9pt;
+      white-space: pre-wrap;
+      white-space: -moz-pre-wrap;
+      white-space: -o-pre-wrap;
+      word-wrap: break-word;
+
+      .string {
+        color: green;
+      }
+      .number {
+        color: darkorange;
+      }
+      .boolean {
+        color: blue;
+      }
+      .null {
+        color: magenta;
+      }
+      .key {
+        color: red;
+      }
+    }
+  }
+
+  .login-state {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    background: #bdf9cf;
+  }
+}

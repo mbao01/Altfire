@@ -1,0 +1,18 @@
+<ion-content padding>
+    <ion-grid style="padding-top: 50px;">
+        <ion-row>
+            <ion-img src="assets/robot.png" alt="Image goes here"></ion-img>
+        </ion-row>
+        <ion-row>
+            <ion-item>
+                {{ user.firstname }} {{ user.lastname }}
+            </ion-item>
+        </ion-row>
+        <ion-row>
+            <button ion-button full (click)="userMode('continue')"> Use this account </button>
+        </ion-row>
+        <ion-row>
+            <button ion-button clear full (click)="userMode('newuser')"> New User ? </button>
+        </ion-row>
+    </ion-grid>
+</ion-content>
