@@ -8,8 +8,10 @@ page-restful {
     padding: 20px 10px;
   }
 
-  .summary ion-item {
-    font-size: 10px !important;
+  .summary {
+    ion-item, code {
+      font-size: 10px;
+    }
   }
 
   ion-textarea {
