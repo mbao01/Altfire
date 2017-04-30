@@ -14,22 +14,26 @@ export class TabsPage {
 
     count: { graph?: number, rest?: number };
 
+    /**
+     *
+     * @param navCtrl
+     * @param navParams
+     */
     constructor(public navCtrl: NavController, public navParams: NavParams) {
     }
 
+    /**
+     * Initialize Graph and Rest operations count
+     */
     ngOnInit() {
         console.log('ngOnInit Tabs');
         this.count = this.navParams.data ? this.navParams.data : {};
     }
 
+    /**
+     * TODO: DELETE
+     */
     ionViewDidLoad() {
         console.log('ionViewDidLoad Tabs');
     }
-
-    // onToggleView(page: any){
-    //     if(this.navCtrl.last() != page) {
-    //         this.navCtrl.push(page);
-    //     }
-    // }
-
 }

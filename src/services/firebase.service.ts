@@ -9,6 +9,9 @@ import DataSnapshot = firebase.database.DataSnapshot;
 @Injectable()
 export class FirebaseService {
 
+    /**
+     * Firebase Service Constructor
+     */
     constructor() {
         // Initialize Firebase
         let config = {
@@ -22,18 +25,34 @@ export class FirebaseService {
         firebase.initializeApp(config);
     }
 
+    /**
+     * Get user authentication state from Firebase
+     * @returns {any}
+     */
     auth() {
         return firebase.auth();
     }
 
+    /**
+     * Get current user fro Firebase
+     * @returns {()=>()=>any}
+     */
     currentUser() {
         return firebase.auth().currentUser
     }
 
+    /**
+     * Sign user out of Firebase
+     */
     logout() {
         firebase.auth().signOut();
     }
 
+    /**
+     * Create new User using EmailAndPassword method in Firebase
+     * @param credentials
+     * @returns {Bluebird<R>}
+     */
     createEmailUser(credentials) {
         return firebase.auth().createUserWithEmailAndPassword(credentials.email, credentials.password)
             .then((authData) => {
@@ -45,6 +64,11 @@ export class FirebaseService {
             });
     }
 
+    /**
+     * Sign user in to Firebase
+     * @param credentials
+     * @returns {Bluebird<R>}
+     */
     login(credentials) {
         console.log('User Credentials: LOGIN', credentials);
         return firebase.auth().signInWithEmailAndPassword(credentials.email, credentials.password)
@@ -66,8 +90,13 @@ export class FirebaseService {
             });
     }
 
+    /**
+     * Upload file from Local to Firebase Storage
+     * @param _imageData
+     * @param _progress
+     * @returns {Observable}
+     */
     uploadPhotoFromFile(_imageData, _progress) {
-
 
         return new Observable(observer => {
             let _time = new Date().getTime();
@@ -107,8 +136,12 @@ export class FirebaseService {
         });
     }
 
-    getDataObs() {
-        let ref = firebase.database().ref('images');
+    /**
+     * Get all references from database
+     * @returns {void|any|Server}
+     */
+    getDataObs(reference: string) {
+        let ref = firebase.database().ref(reference);
 
         return ref.on('value', (snapshot) => {
             let arr = [];

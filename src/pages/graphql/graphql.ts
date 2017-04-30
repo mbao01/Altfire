@@ -36,6 +36,16 @@ export class GraphqlPage {
     # will appear automatically.    
 `;
 
+    /**
+     * GraphQL Page Constructor
+     * @param navCtrl
+     * @param popoverCtrl
+     * @param alertCtrl
+     * @param graphqlService
+     * @param authService
+     * @param storageService
+     * @param h
+     */
     constructor(
         public navCtrl: NavController,
         private popoverCtrl: PopoverController,
@@ -45,15 +55,25 @@ export class GraphqlPage {
         private storageService: StorageService,
         private h: HelperService) { }
 
+    /**
+     * TODO: DELETE
+     */
     ionViewDidLoad() {
         console.log('ionViewDidLoad Graphql');
     }
 
+    /**
+     * Initialize last Graph query and User data
+     */
     ngOnInit() {
         this.graph = this.graphqlService.getGraph();
         this.user = this.authService.getUser();
     }
 
+    /**
+     * Show popover based on User State
+     * @param myEvent
+     */
     presentPopover(myEvent) {
         let popover = this.popoverCtrl.create(PopoverComponent);
         popover.present({
@@ -61,6 +81,10 @@ export class GraphqlPage {
         });
     }
 
+    /**
+     * Validate and Set Graph query api endpoint
+     * @param endpoint
+     */
     onSetEndpoint(endpoint) {
         let url = endpoint;
         this.endpoint_set = false;
@@ -75,6 +99,10 @@ export class GraphqlPage {
         }
     }
 
+    /**
+     * Set Graph query or mutation
+     * @param query
+     */
     onSetQuery(query: string) {
         if(query) {
             this.graph.query_type = 'query';
@@ -86,6 +114,9 @@ export class GraphqlPage {
         }
     }
 
+    /**
+     * Fetch graph query response if graph api endpoint is valid
+     */
     onSendQuery() {
         if(this.graph.endpoint) {
             let loading = this.h.loader({msg: 'Fetching . . .', dismissOnPageChange: true});
@@ -103,21 +134,38 @@ export class GraphqlPage {
         }
     }
 
+    /**
+     * Call Graph Service to Update Graph data in Localstorage
+     * @param graph
+     */
     onGraphChange(graph: Graph) {
         this.graph = this.graphqlService.updateGraph(graph);
     }
 
+    /**
+     * Display toast message
+     * @param data
+     * @param duration
+     */
     onShowToast(data: string, duration?: number) {
         this.h.toast({msg: data, duration: duration ? duration : 2000}).present();
     }
 
-    onSuccess = (data) => {
-        this.graph.response = data;
+    /**
+     * Success handler for successful query response
+     * @param success
+     */
+    onSuccess(success) {
+        this.graph.response = success;
         this.response_valid = true;
         this.state = 'response';
     };
 
-    onFailure = (error) => {
+    /**
+     * Failure handler for error response
+     * @param error
+     */
+    onFailure(error) {
         this.graph.response = error;
         this.response_valid = false;
         let errorAlert = this.alertCtrl.create({
@@ -128,15 +176,28 @@ export class GraphqlPage {
         errorAlert.present();
     };
 
+    /**
+     * Toggle between graph query view and graph response view
+     * @param state
+     */
     onToggleState(state: string) {
         this.state = (state == 'query') ? 'response' : (state == 'response') ? 'query' : '';
     }
 
-
+    /**
+     * Calls Graph Service to
+     * @param data
+     * @returns {(number|boolean)[]}
+     */
     getAttributes(data: Array<any>) {
         return this.graphqlService.attributes(data);
     }
 
+    /**
+     * Set Graph Query Header
+     * @param header
+     * @param index
+     */
     onSetHeaders(header: GraphHeader, index: number) {
         if(header && header.key && header.value) {
             console.log('Headers SET: ', header);
@@ -149,6 +210,9 @@ export class GraphqlPage {
         this.header_detail = this.getAttributes(this.graph.headers);
     }
 
+    /**
+     * Add New Graph Query Header
+     */
     onAddNewHeader() {
         let lastItemIndex = this.graph.headers.length;
         if(this.graph.headers && this.graph.headers[lastItemIndex-1].key && this.graph.headers[lastItemIndex-1].value) {
@@ -164,6 +228,10 @@ export class GraphqlPage {
         this.header_detail = this.getAttributes(this.graph.headers);
     }
 
+    /**
+     * Delete Graph Query Header
+     * @param index
+     */
     onDeleteHeader(index: number) {
         let size = this.graph.headers.length;
         let deleteHeaderWithContent: boolean = false;
@@ -192,6 +260,11 @@ export class GraphqlPage {
         this.onGraphChange(this.graph);
     }
 
+    /**
+     * Add syntax highlighting to graph response
+     * @param json
+     * @returns {string|void|any}
+     */
     colorify(json) {
         json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {

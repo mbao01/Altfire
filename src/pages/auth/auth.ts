@@ -17,23 +17,42 @@ export class AuthPage {
     cpassword: string;
     user: User;
 
+    /**
+     * Authentication Service Constructor
+     * @param navCtrl
+     * @param navParams
+     * @param authService
+     * @param h
+     */
     constructor(public navCtrl: NavController,
                 public navParams: NavParams,
                 private authService: AuthService,
                 private h: HelperService) {}
-    
+
+    /**
+     * TODO: DELETE
+     */
     ionViewDidLoad() {
         console.log('ionViewDidLoad Auth');
     }
 
+    /**
+     * Initialize form
+     */
     ngOnInit() {
         this._initializeForm(this.navParams.get('data') ? this.navParams.data : { auth_type: 'signin', data: this._initInput('signin') });
     }
 
+    /**
+     * Calls authentication service to sign user up
+     */
     onSignup() {
         this.authService.signup(this.f.value);
     }
 
+    /**
+     * Calls authentication service to sign user in
+     */
     onSignin() {
         this.h.loader({msg: 'signing you in . . . ', dismissOnPageChange: true}).present();
         // FIXME: Fix signing in with invalid credentials
@@ -47,6 +66,9 @@ export class AuthPage {
         });
     }
 
+    /**
+     * Toggle between Signin Page and Signup Page
+     */
     onToggleAuth() {
         if(this.auth_type == 'signin') {
             this._initializeForm({ auth_type: 'signup', data: this._initInput('signup')});
@@ -55,11 +77,20 @@ export class AuthPage {
         }
     }
 
+    /**
+     * Sign User in as Guest, set Guest Id
+     */
     onContinueAsGuestUser() {
         this.h.loader({msg: 'Welcome guest . . . ', dismissOnPageChange: true}).present();
         this.navCtrl.setRoot(TabsPage);
     }
 
+    /**
+     * Set form initialization object
+     * @param auth_type
+     * @returns {User}
+     * @private
+     */
     _initInput(auth_type) {
         this.user = this.authService.getUser();
         if(this.f) { delete this.f; }
@@ -81,6 +112,11 @@ export class AuthPage {
         return this.user;
     }
 
+    /**
+     * Initialize form based on authentication type (Signin or Signup)
+     * @param params
+     * @private
+     */
     _initializeForm(params?: { auth_type: string, data}) {
         if(params && params.auth_type) {
             this.auth_type = params.auth_type;
@@ -95,6 +131,11 @@ export class AuthPage {
         });
     }
 
+    /**
+     * Display toast message
+     * @param data
+     * @param duration
+     */
     onShowToast(data: string, duration?: number) {
         this.h.toast({msg: data, duration: duration ? duration : 2000}).present();
     }

@@ -28,18 +28,36 @@ export class RestfulService {
         response: null
     };
 
+    /**
+     * RESTful Service Constructor
+     * @param http
+     */
     constructor(private http: Http) {
 
     }
 
+    /**
+     * Return Rest object
+     * @returns {Rest}
+     */
     getRest() {
         return this.rest;
     }
 
+    /**
+     * Update Rest object
+     * @param rest
+     * @returns {Rest}
+     */
     updateRest(rest: Rest) {
         return this.rest = rest;
     }
 
+    /**
+     * Add "http" protocol if no protocol is set and Validate request url using HTTP HEAD Method
+     * @param url
+     * @returns {Bluebird<R>}
+     */
     validateUrl(url: string) {
         if(!url.match(/((ht|f)tps?:\/\/)/)) {
             url = 'http://' + url;
@@ -51,6 +69,11 @@ export class RestfulService {
         });
     }
 
+    /**
+     * Send HTTP Request using GET Method
+     * @param rest
+     * @returns {any}
+     */
     get(rest: Rest) {
         this.rest = rest;
         if(rest.request_header) {
@@ -60,6 +83,11 @@ export class RestfulService {
         }
     }
 
+    /**
+     * Send HTTP Request using POST Method
+     * @param rest
+     * @returns {any}
+     */
     post(rest: Rest) {
         this.rest = rest;
         if(rest.request_header && rest.request_body) {
@@ -69,21 +97,41 @@ export class RestfulService {
         }
     }
 
+    /**
+     * Send HTTP Request using PUT Method
+     * @param rest
+     * @returns {any}
+     */
     put(rest: Rest) {
         this.rest = rest;
         return this.http.put(rest.request_url, this._flattenBody(rest.request_body, rest.request_body_type)).toPromise();
     }
 
+    /**
+     * Send HTTP Request using PATCH Method
+     * @param rest
+     * @returns {any}
+     */
     patch(rest: Rest) {
         this.rest = rest;
         return this.http.patch(rest.request_url, this._flattenBody(rest.request_body, rest.request_body_type)).toPromise();
     }
 
+    /**
+     * Send HTTP Request using DELETE Method
+     * @param rest
+     * @returns {any}
+     */
     delete(rest: Rest) {
         this.rest = rest;
         return this.http.delete(rest.request_url, this._flattenBody(rest.request_body, rest.request_body_type)).toPromise();
     }
 
+    /**
+     * Return valid attributes based on checked status
+     * @param array
+     * @returns {[number,boolean]}
+     */
     attributes(array) {
         let c = 0, b = true;
         for(let a of array) {
@@ -97,6 +145,12 @@ export class RestfulService {
         return [c, b];
     }
 
+    /**
+     * Flatten rest request headers and return only checked headers
+     * @param roughHeaders
+     * @returns {Headers}
+     * @private
+     */
     _flattenHeaders(roughHeaders?) {
         let headers = new Headers();
         for(let h of roughHeaders) {
@@ -107,6 +161,13 @@ export class RestfulService {
         return headers;
     }
 
+    /**
+     * Flatten rest request body and return only checked body
+     * @param roughBody
+     * @param bodyType
+     * @returns {any}
+     * @private
+     */
     _flattenBody(roughBody, bodyType) {
         let body = '';
         if(bodyType = 'x-www-form-urlencoded') {

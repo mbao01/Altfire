@@ -36,6 +36,16 @@ export class Entry {
     user: User;
     @ViewChild('nav') nav: NavController;
 
+    /**
+     * Application Entry Component Constructor
+     * @param platform
+     * @param statusBar
+     * @param splashScreen
+     * @param modalCtrl
+     * @param authService
+     * @param storageService
+     * @param h
+     */
     constructor(platform: Platform,
                 statusBar: StatusBar,
                 splashScreen: SplashScreen,
@@ -49,6 +59,10 @@ export class Entry {
         });
     }
 
+    /**
+     * Render Last App State, Fetch App unique Id, User Token from storage
+     * ngOnInit lifecycle hook
+     */
     ngOnInit() {
         console.log('Initializing MENU');
         this.storageService.renderData();
@@ -91,14 +105,29 @@ export class Entry {
         });
     }
 
+    /**
+     * TODO: DELETE
+     * ionViewWillEnter lifecycle hook
+     */
     ionViewWillEnter() {
         console.log('ionViewDidEnter MENU');
     }
 
+    /**
+     * Display toast message
+     * @param data
+     * @param duration
+     */
     onShowToast(data: string, duration?: number) {
         this.h.toast({msg: data, duration: duration ? duration : 2000}).present();
     }
 
+    /**
+     * Set User Form fields initialization data
+     * @param user
+     * @returns {User}
+     * @private
+     */
     _initInput(user?) {
         this.user.email = user && user.email ? user.email : null;
         this.user.username = 'hidden';

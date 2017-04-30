@@ -3,17 +3,29 @@ import {Injectable} from "@angular/core";
 
 @Injectable()
 export class HelperService {
-    constructor(private alertCtrl: AlertController, private toastCtrl: ToastController, private loadingCtrl: LoadingController) {}
-    // ERROR HANDLERS
 
-    // ALERT HANDLERS
+    /**
+     * Helpers Service Constructor
+     * @param alertCtrl
+     * @param toastCtrl
+     * @param loadingCtrl
+     */
+    constructor(private alertCtrl: AlertController, private toastCtrl: ToastController, private loadingCtrl: LoadingController) {}
+
+    /**
+     * Alert Helper
+     */
     alert() {
         this.alertCtrl.create({
 
         })
     }
 
-    // TOAST HANDLERS
+    /**
+     * Toast Helper
+     * @param opts
+     * @returns {Toast}
+     */
     toast(opts?: {msg?: string, position?: string, closeButton?: string, duration?: number}) {
         return this.toastCtrl.create({
             message: opts.msg ? opts.msg : ' Good to have you . . . ',
@@ -24,9 +36,11 @@ export class HelperService {
         });
     }
 
-    // SUCCESS HANDLERS
-
-    // LOADERS
+    /**
+     * Loading Helper
+     * @param opts
+     * @returns {Loading}
+     */
     loader(opts?: {msg?: string, delay?: number, spinner?: string; dismissOnPageChange?: boolean}) {
         return this.loadingCtrl.create({
             content: opts.msg ? opts.msg : ' Recieving.',

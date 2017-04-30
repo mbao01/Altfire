@@ -37,6 +37,16 @@ export class RestfulPage {
     `;
     rest: Rest = this.restfulService.getRest();
 
+    /**
+     *
+     * @param navCtrl
+     * @param alertCtrl
+     * @param popoverCtrl
+     * @param restfulService
+     * @param authService
+     * @param storageService
+     * @param h
+     */
     constructor(public navCtrl: NavController,
                 private alertCtrl: AlertController,
                 private popoverCtrl: PopoverController,
@@ -45,16 +55,26 @@ export class RestfulPage {
                 private storageService: StorageService,
                 private h: HelperService) { }
 
-    // ionViewDidLoad() {
-    //     console.log('ionViewDidLoad RESTful');
-    // }
+    /**
+     *
+     */
+    ionViewDidLoad() {
+        console.log('ionViewDidLoad RESTful');
+    }
 
+    /**
+     * Initialize last Rest request and User data
+     */
     ngOnInit() {
         this.rest = this.restfulService.getRest();
         this.request_url = this.rest.request_url;
         this.user = this.authService.getUser();
     }
 
+    /**
+     * Show popover based on User State
+     * @param myEvent
+     */
     presentPopover(myEvent) {
         let popover = this.popoverCtrl.create(PopoverComponent);
         popover.present({
@@ -62,6 +82,9 @@ export class RestfulPage {
         });
     }
 
+    /**
+     * Set Rest Request HTTP Method
+     */
     showOptions() {
         const alert = this.alertCtrl.create({
             title: 'Request Type',
@@ -112,12 +135,20 @@ export class RestfulPage {
         alert.present();
     }
 
+    /**
+     * Success handler for successful rest response
+     * @param data
+     */
     onSuccess = (data) => {
         this.rest.response = data.json();
         this.storageService.saveRecentRestful({rest: this.rest});
         this.response_valid = true;
     };
 
+    /**
+     * Failure handler for error response
+     * @param error
+     */
     onFailure = (error) => {
         this.rest.response = error;
         this.storageService.saveRecentRestful({rest: this.rest});
@@ -130,10 +161,18 @@ export class RestfulPage {
         errorAlert.present();
     };
 
+    /**
+     * Display toast message
+     * @param data
+     * @param duration
+     */
     onShowToast(data: string, duration?: number) {
         this.h.toast({msg: data, duration: duration ? duration : 2000}).present();
     }
 
+    /**
+     * Send rest request and fetch rest response if request url is valid
+     */
     onSendRequest() {
         if(this.rest.request_url) {
             let loading = this.h.loader({msg: 'Fetching . . .', dismissOnPageChange: true});
@@ -185,6 +224,10 @@ export class RestfulPage {
         }
     }
 
+    /**
+     * Validate and Set Rest request url
+     * @param inputUrl
+     */
     onSetUrl(inputUrl) {
         let url = inputUrl;
         if(url) {
@@ -200,10 +243,20 @@ export class RestfulPage {
         }
     }
 
+    /**
+     * Calls Rest Service to
+     * @param data
+     * @returns {(number|boolean)[]}
+     */
     getAttributes(data: Array<any>) {
         return this.restfulService.attributes(data);
     }
 
+    /**
+     * Set Rest Request Header
+     * @param header
+     * @param index
+     */
     onSetHeaders(header: ReqHeader, index: number) {
         if(header && header.key && header.value) {
             this.rest.request_header.splice(index, 1, header);
@@ -215,6 +268,9 @@ export class RestfulPage {
         this.request_header_detail = this.getAttributes(this.rest.request_header);
     }
 
+    /**
+     * Add New Rest Request Header
+     */
     onAddNewHeader() {
         let lastItemIndex = this.rest.request_header.length;
         if(this.rest.request_header && this.rest.request_header[lastItemIndex-1].key && this.rest.request_header[lastItemIndex-1].value) {
@@ -230,6 +286,10 @@ export class RestfulPage {
         this.request_header_detail = this.getAttributes(this.rest.request_header);
     }
 
+    /**
+     * Delete Rest Request Header
+     * @param index
+     */
     onDeleteHeader(index: number) {
         let size = this.rest.request_header.length;
         let deleteHeaderWithContent = false;
@@ -257,6 +317,11 @@ export class RestfulPage {
         this.onRestChange(this.rest);
     }
 
+    /**
+     * Set Rest Request Body
+     * @param body
+     * @param index
+     */
     onSetBody(body: ReqBody, index: number) {
         if(body && body.key && body.value) {
             this.rest.request_body.splice(index, 1, body);
@@ -266,6 +331,10 @@ export class RestfulPage {
         this.onRestChange(this.rest);
     }
 
+    /**
+     * Set Rest Request Body Type
+     * @param body_type
+     */
     onSetBodyType(body_type) {
         if(body_type && this.rest) {
             this.rest.request_body_type = body_type;
@@ -273,6 +342,9 @@ export class RestfulPage {
         this.onRestChange(this.rest);
     }
 
+    /**
+     * Add New Rest Request Body
+     */
     onAddNewBody() {
         let lastItemIndex = this.rest.request_body.length;
         if(this.rest.request_body && this.rest.request_body[lastItemIndex-1].key && this.rest.request_body[lastItemIndex-1].value) {
@@ -288,6 +360,10 @@ export class RestfulPage {
         this.request_body_detail = this.getAttributes(this.rest.request_body);
     }
 
+    /**
+     * Delete Rest Request Body
+     * @param index
+     */
     onDeleteBody(index: number) {
         let size = this.rest.request_body.length;
         if(size > 1 && this.rest.request_body[index]) {
@@ -305,6 +381,10 @@ export class RestfulPage {
         this.onRestChange(this.rest);
     }
 
+    /**
+     * Call Rest Service to Update Rest data in Localstorage
+     * @param rest
+     */
     onRestChange(rest: Rest) {
         this.rest = this.restfulService.updateRest(rest);
     }
