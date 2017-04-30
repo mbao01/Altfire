@@ -36,16 +36,22 @@ export class RequestBodyComponent {
     @Output('delete') delete = new EventEmitter();
     @Input('bodyProperty') body: ReqBody;
 
-    constructor() {
-    }
+    constructor() { }
 
+    /**
+     * Emit event with request body data
+     * @param body
+     */
     getInput(body) {
-        console.log(body.key+' = '+body.value);
         if(body.key && body.value){
             this.bodyEvent.emit(body);
         }
     }
 
+    /**
+     * Emit event to delete single request body
+     * @param body
+     */
     deletebody(body){
         this.delete.emit(body);
     }

@@ -14,6 +14,9 @@ import {ViewController} from "ionic-angular";
 export class MethodsComponent {
     constructor(public viewCtrl: ViewController) {}
 
+    /**
+     *
+     */
     close() {
         this.viewCtrl.dismiss();
     }

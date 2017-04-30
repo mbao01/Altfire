@@ -39,13 +39,20 @@ export class RequestHeaderComponent {
     constructor() {
     }
 
+    /**
+     * Emit event with request header data
+     * @param header
+     */
     getInput(header) {
-        console.log(header.key+' = '+header.value);
         if(header.key && header.value){
             this.headerEvent.emit(header);
         }
     }
 
+    /**
+     * Emit event to delete single request header
+     * @param header
+     */
     deleteHeader(header){
         this.delete.emit(header);
     }
