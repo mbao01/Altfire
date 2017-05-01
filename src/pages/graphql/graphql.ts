@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, ErrorHandler} from '@angular/core';
 import {AlertController, NavController, PopoverController} from 'ionic-angular';
 import {GraphqlHTTPClient} from "../../services/graphql.service";
 import {Graph} from "../../models/graphql/graphql.model";
@@ -53,7 +53,8 @@ export class GraphqlPage {
         private graphqlService: GraphqlHTTPClient,
         private authService: AuthService,
         private storageService: StorageService,
-        private h: HelperService) { }
+        private h: HelperService,
+        private logger: ErrorHandler) { }
 
     /**
      * TODO: DELETE
@@ -126,7 +127,7 @@ export class GraphqlPage {
                 this.onSuccess(data);
                 loading.dismiss();
             }).catch((err) => {
-                console.log(err);
+                this.logger.handleError(err);
                 this.onFailure(err);
                 loading.dismiss();
             });

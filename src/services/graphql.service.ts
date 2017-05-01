@@ -1,4 +1,4 @@
-import {Injectable} from "@angular/core";
+import {ErrorHandler, Injectable} from "@angular/core";
 import {Http} from "@angular/http";
 import {Graph} from "../models/graphql/graphql.model";
 
@@ -26,7 +26,7 @@ export class GraphqlHTTPClient {
      * GraphQL Service Constructor
      * @param http
      */
-    constructor(private http: Http) {
+    constructor(private http: Http, private logger: ErrorHandler) {
 
     }
 
@@ -66,7 +66,9 @@ export class GraphqlHTTPClient {
                     if (err.errors && err.errors.length) {
                         throw this.GraphqlError(graph.query, err.errors)
                     }
-                    return err
+                this.logger.handleError(err);
+
+                return err
 
                 });
     };

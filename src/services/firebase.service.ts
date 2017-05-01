@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {ErrorHandler, Injectable} from '@angular/core';
 import 'rxjs/Rx';
 import {Observable} from "rxjs/Observable";
 
@@ -12,7 +12,7 @@ export class FirebaseService {
     /**
      * Firebase Service Constructor
      */
-    constructor() {
+    constructor(private logger: ErrorHandler) {
         // Initialize Firebase
         let config = {
             apiKey: "AIzaSyArbrFyjEbye1OPdb2PKjEivXSBzVZQnTw",
@@ -58,9 +58,9 @@ export class FirebaseService {
             .then((authData) => {
                 console.log("User created successfully with payload-", authData);
                 return authData;
-            }).catch((_error) => {
-                console.log("Login Failed!", _error);
-                return _error;
+            }).catch((err) => {
+                this.logger.handleError(err);
+                return err;
             });
     }
 
@@ -84,9 +84,6 @@ export class FirebaseService {
                     expire: 1000000,
                     tokenValid: true
                 };
-            }).catch((_error) => {
-                console.log("Login Failed!", _error);
-                return _error;
             });
     }
 
