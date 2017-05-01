@@ -1,4 +1,4 @@
-import {Injectable} from "@angular/core";
+import {ErrorHandler, Injectable} from "@angular/core";
 import {Http} from "@angular/http";
 import {StorageService} from "./storage.service";
 import {FirebaseService} from "./firebase.service";
@@ -18,8 +18,9 @@ export class AuthService {
      * @param http
      * @param storageService
      * @param firebaseService
+     * @param logger
      */
-    constructor(private http: Http, private storageService: StorageService, private firebaseService: FirebaseService) {
+    constructor(private http: Http, private storageService: StorageService, private firebaseService: FirebaseService, private logger: ErrorHandler) {
     }
 
     /**
@@ -60,6 +61,8 @@ export class AuthService {
         this.storageService.removeUser().then(() => {
             this.user.tokenValid = false;
             this.firebaseService.logout();
+        }).catch((err) => {
+            this.logger.handleError(err);
         });
     }
 
@@ -79,6 +82,8 @@ export class AuthService {
     signup(user) {
         this.firebaseService.createEmailUser(user).then(() => {
             this.setUser(user);
+        }).catch((err) => {
+            this.logger.handleError(err);
         });
     }
 
