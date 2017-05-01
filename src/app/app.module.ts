@@ -29,7 +29,8 @@ import {HelperService} from "../services/helpers";
         Altfire.RequestHeaderComponent,
         Altfire.RequestBodyComponent,
         Altfire.RequestAuthorizationComponent,
-        Altfire.PopoverComponent
+        Altfire.PopoverComponent,
+        Altfire.MethodsComponent
     ],
     imports: [
         BrowserModule,

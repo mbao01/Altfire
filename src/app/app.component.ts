@@ -38,24 +38,30 @@ export class Entry {
 
     /**
      * Application Entry Component Constructor
-     * @param platform
-     * @param statusBar
-     * @param splashScreen
+     * @param _platform
+     * @param _statusBar
+     * @param _splashScreen
      * @param modalCtrl
      * @param authService
      * @param storageService
      * @param h
      */
-    constructor(platform: Platform,
-                statusBar: StatusBar,
-                splashScreen: SplashScreen,
+    constructor(private _platform: Platform,
+                private _statusBar: StatusBar,
+                private _splashScreen: SplashScreen,
                 private modalCtrl: ModalController,
                 private authService: AuthService,
                 private storageService: StorageService,
                 private h: HelperService) {
-        platform.ready().then(() => {
-            statusBar.styleDefault();
-            splashScreen.hide();
+        this._initializeApp();
+    }
+
+    _initializeApp() {
+        this._platform.ready().then(() => {
+            this._statusBar.styleDefault();
+            setTimeout(() => {
+                this._splashScreen.hide();
+            }, 10);
         });
     }
 
