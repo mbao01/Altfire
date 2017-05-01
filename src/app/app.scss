@@ -21,3 +21,7 @@ page-tabs {
 [scrollbar-y-auto] .scroll-content {
   overflow-y: auto !important;
 }
+
+[scrollbar-y-scroll] .scroll-content {
+  overflow-y: scroll !important;
+}
