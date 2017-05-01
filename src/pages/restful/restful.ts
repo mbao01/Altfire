@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, ErrorHandler} from '@angular/core';
 import {
     AlertController, NavController, PopoverController
 } from 'ionic-angular';
@@ -54,7 +54,8 @@ export class RestfulPage {
                 private restfulService: RestfulService,
                 private authService: AuthService,
                 private storageService: StorageService,
-                private h: HelperService) { }
+                private h: HelperService,
+                private logger: ErrorHandler) { }
 
     /**
      *
@@ -179,52 +180,14 @@ export class RestfulPage {
         if(this.rest.request_url) {
             let loading = this.h.loader({msg: 'Fetching . . .', dismissOnPageChange: true});
             loading.present();
-            switch (this.rest.request_type) {
-                case 'get':
-                    this.restfulService.get(this.rest).then((response: Response) => {
-                        this.onSuccess(response);
-                        loading.dismiss();
-                    }).catch((err) => {
-                        this.onFailure(err);
-                        loading.dismiss();
-                    });
-                    break;
-                case 'post':
-                    this.restfulService.post(this.rest).then((response: Response) => {
-                        this.onSuccess(response);
-                        loading.dismiss();
-                    }).catch((err) => {
-                        loading.dismiss();
-                        this.onFailure(err);
-                    });
-                    break;
-                case 'put':
-                    this.restfulService.put(this.rest).then((response: Response) => {
-
-                    });
-                    break;
-                case 'patch':
-                    this.restfulService.patch(this.rest).then((response: Response) => {
-                        this.onSuccess(response);
-                        loading.dismiss();
-                    }).catch((err) => {
-                        loading.dismiss();
-                        this.onFailure(err);
-                    });
-                    break;
-                case 'delete':
-                    this.restfulService.delete(this.rest).then((response: Response) => {
-                        this.onSuccess(response);
-                        loading.dismiss();
-                    }).catch((err) => {
-                        loading.dismiss();
-                        this.onFailure(err);
-                    });
-                    break;
-                default:
-                    loading.dismiss();
-                    break;
-            }
+            this.restfulService.method(this.rest.request_type, this.rest).then((response: Response) => {
+                this.onSuccess(response);
+                loading.dismiss();
+            }).catch((err) => {
+                this.logger.handleError(err);
+                this.onFailure(err);
+                loading.dismiss();
+            });
         }
     }
 
@@ -241,6 +204,7 @@ export class RestfulPage {
                     this.rest.request_url = url;
                     this.onRestChange(this.rest);
                 }).catch((err) => {
+                    this.logger.handleError(err);
                     this.onShowToast(err);
                 });
             }

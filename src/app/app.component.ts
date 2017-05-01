@@ -1,4 +1,4 @@
-import {Component, ViewChild} from '@angular/core';
+import {Component, ErrorHandler, OnInit, ViewChild} from '@angular/core';
 import {ModalController, NavController, Platform} from 'ionic-angular';
 import {StatusBar} from '@ionic-native/status-bar';
 import {SplashScreen} from '@ionic-native/splash-screen';
@@ -29,7 +29,7 @@ export {SigninModal} from '../pages/modals/signin-modal/signin-modal';
 @Component({
     templateUrl: 'app.html'
 })
-export class Entry {
+export class Entry implements OnInit {
     private _date = new Date();
     authPage = AuthPage;
     settingsPage = SettingsPage;
@@ -52,16 +52,15 @@ export class Entry {
                 private modalCtrl: ModalController,
                 private authService: AuthService,
                 private storageService: StorageService,
-                private h: HelperService) {
+                private h: HelperService,
+                private logger: ErrorHandler) {
         this._initializeApp();
     }
 
     _initializeApp() {
         this._platform.ready().then(() => {
             this._statusBar.styleDefault();
-            setTimeout(() => {
-                this._splashScreen.hide();
-            }, 10);
+            this._splashScreen.hide();
         });
     }
 
@@ -70,12 +69,9 @@ export class Entry {
      * ngOnInit lifecycle hook
      */
     ngOnInit() {
-        console.log('Initializing MENU');
         this.storageService.renderData();
         this.storageService.getAltfireApp().then((data) => {
-            console.log('Altfire App Id: SUCCESS', data);
             this.storageService.getUser().then((user: User) => {
-                console.log('User in Secure Storage: SUCCESS', user);
                 if(user.token && user.expire > this._date.getTime()) {
                     user.tokenValid = true;
                     this.authService.setUser(user);
@@ -94,6 +90,8 @@ export class Entry {
                                 user.tokenValid = false;
                                 this.onShowToast('please signin to save your work');
                                 this.nav.setRoot(this.authPage, {auth_type: 'signin', data: this._initInput(user)});
+                            }).catch((err) => {
+                                this.logger.handleError(err);
                             });
                         }
                     });
@@ -101,11 +99,12 @@ export class Entry {
                 } else {
                     this.nav.setRoot(this.authPage, { auth_type: 'signin', data: this._initInput(user)});
                 }
-            }).catch(() => {
+            }).catch((err) => {
+                this.logger.handleError(err);
                 this.nav.setRoot(this.authPage, { auth_type: 'signup', data: {} });
             });
         }).catch((err) => {
-            console.log('Error from either Altfire Id or User: ERROR', err);
+            this.logger.handleError(err);
             this.nav.setRoot(this.authPage, { auth_type: 'signup', data: {} });
             this.storageService.setAltfireApp().then();
         });
