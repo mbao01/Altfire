@@ -11,6 +11,7 @@ import {User} from "../../models/user.model";
 import {AuthService} from "../../services/auth.service";
 import {HelperService} from "../../services/helpers";
 import {PopoverComponent} from "../../components/popover";
+import {Response} from "@angular/http";
 
 @Component({
     selector: 'page-restful',
@@ -139,8 +140,9 @@ export class RestfulPage {
      * Success handler for successful rest response
      * @param data
      */
-    onSuccess = (data) => {
-        this.rest.response = data.json();
+    onSuccess(data: Response) {
+        this.rest.response = data.headers.get('content-type').match(/application\/json/) ? data.json() : data;
+        console.log(data.json());
         this.storageService.saveRecentRestful({rest: this.rest});
         this.response_valid = true;
     };
@@ -149,7 +151,7 @@ export class RestfulPage {
      * Failure handler for error response
      * @param error
      */
-    onFailure = (error) => {
+    onFailure(error) {
         this.rest.response = error;
         this.storageService.saveRecentRestful({rest: this.rest});
         this.response_valid = false;
@@ -179,8 +181,8 @@ export class RestfulPage {
             loading.present();
             switch (this.rest.request_type) {
                 case 'get':
-                    this.restfulService.get(this.rest).then((data) => {
-                        this.onSuccess(data);
+                    this.restfulService.get(this.rest).then((response: Response) => {
+                        this.onSuccess(response);
                         loading.dismiss();
                     }).catch((err) => {
                         this.onFailure(err);
@@ -188,8 +190,8 @@ export class RestfulPage {
                     });
                     break;
                 case 'post':
-                    this.restfulService.post(this.rest).then((data) => {
-                        this.onSuccess(data);
+                    this.restfulService.post(this.rest).then((response: Response) => {
+                        this.onSuccess(response);
                         loading.dismiss();
                     }).catch((err) => {
                         loading.dismiss();
@@ -197,11 +199,13 @@ export class RestfulPage {
                     });
                     break;
                 case 'put':
-                    this.restfulService.put(this.rest);
+                    this.restfulService.put(this.rest).then((response: Response) => {
+
+                    });
                     break;
                 case 'patch':
-                    this.restfulService.patch(this.rest).then((data) => {
-                        this.onSuccess(data);
+                    this.restfulService.patch(this.rest).then((response: Response) => {
+                        this.onSuccess(response);
                         loading.dismiss();
                     }).catch((err) => {
                         loading.dismiss();
@@ -209,8 +213,8 @@ export class RestfulPage {
                     });
                     break;
                 case 'delete':
-                    this.restfulService.delete(this.rest).then((data) => {
-                        this.onSuccess(data);
+                    this.restfulService.delete(this.rest).then((response: Response) => {
+                        this.onSuccess(response);
                         loading.dismiss();
                     }).catch((err) => {
                         loading.dismiss();
@@ -233,7 +237,7 @@ export class RestfulPage {
         if(url) {
             let href = url.match(/(((ht|f)tps?:\/\/)?.+\.[a-z]{2,4})/ig);
             if(href && href[0]) {
-                this.restfulService.validateUrl(href[0]).then((url) => {
+                this.restfulService.validateUrl(href[0]).then(() => {
                     this.rest.request_url = url;
                     this.onRestChange(this.rest);
                 }).catch((err) => {
