@@ -12,12 +12,14 @@ import {StorageService} from "../services/storage.service";
 import {SigninModal} from "../pages/modals/signin-modal/signin-modal";
 import {HelperService} from "../services/helpers";
 
-export {HomePage} from '../pages/home/home';
 export {TabsPage} from '../pages/tabs/tabs';
 export {GraphqlPage} from '../pages/graphql/graphql';
 export {RestfulPage} from '../pages/restful/restful';
 export {AuthPage} from '../pages/auth/auth';
 export {SettingsPage} from '../pages/settings/settings';
+export {HistoryPage} from '../pages/history/history';
+export {GraphPage} from '../pages/history/graph/graph';
+export {RestPage} from '../pages/history/rest/rest';
 
 export {MethodsComponent} from '../components/methods';
 export {RequestHeaderComponent} from '../components/header';
@@ -69,19 +71,19 @@ export class Entry implements OnInit {
      * ngOnInit lifecycle hook
      */
     ngOnInit() {
+        let currentTime = this._date.getTime();
         this.storageService.renderData();
         this.storageService.getAltfireApp().then((data) => {
             this.storageService.getUser().then((user: User) => {
-                if(user.token && user.expire > this._date.getTime()) {
+                if(user.token && user.expire > currentTime) {
                     user.tokenValid = true;
                     this.authService.setUser(user);
                     this.nav.setRoot(TabsPage);
-                } else if (user.token && user.expire <= this._date.getTime()) {
+                } else if (user.token && user.expire <= currentTime) {
                     this.h.loader({msg: 'signing you in . . .'});
                     let modal = this.modalCtrl.create(SigninModal, user);
                     modal.onDidDismiss((data) => {
                         if(data && data == 'continue') {
-                            // TODO: Try to send refresh token to firebase to refresh user token
                             user.tokenValid = true;
                             this.onShowToast('Logged in as ' + user.username);
                             this.authService.setUser(user);

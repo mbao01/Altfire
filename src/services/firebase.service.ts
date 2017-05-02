@@ -9,8 +9,11 @@ import DataSnapshot = firebase.database.DataSnapshot;
 @Injectable()
 export class FirebaseService {
 
+    private _database;
+
     /**
      * Firebase Service Constructor
+     * @param logger
      */
     constructor(private logger: ErrorHandler) {
         // Initialize Firebase
@@ -23,6 +26,8 @@ export class FirebaseService {
             messagingSenderId: "267389413595"
         };
         firebase.initializeApp(config);
+
+        this._database = firebase.database();
     }
 
     /**
@@ -37,8 +42,8 @@ export class FirebaseService {
      * Get current user fro Firebase
      * @returns {()=>()=>any}
      */
-    currentUser() {
-        return firebase.auth().currentUser
+    currentUserId() {
+        return firebase.auth().currentUser.uid;
     }
 
     /**
@@ -51,13 +56,29 @@ export class FirebaseService {
     /**
      * Create new User using EmailAndPassword method in Firebase
      * @param credentials
-     * @returns {Bluebird<R>}
+     * @returns {firebase.Thenable<any>}
      */
     createEmailUser(credentials) {
         return firebase.auth().createUserWithEmailAndPassword(credentials.email, credentials.password)
             .then((authData) => {
                 console.log("User created successfully with payload-", authData);
-                return authData;
+                credentials['uid'] = authData.uid;
+                credentials['token'] = authData.Yd;
+                credentials['expire'] = new Date().getTime() + 100000;
+                delete credentials.password;
+                delete credentials.cpassword;
+                return this._setUserInDB(credentials).then(() => {
+                    return {
+                        uid: authData.uid,
+                        token: null,
+                        email: authData.email,
+                        username: null,
+                        firstname: null,
+                        lastname: null,
+                        expire: 0,
+                        tokenValid: false
+                    };
+                });
             }).catch((err) => {
                 this.logger.handleError(err);
                 return err;
@@ -65,27 +86,143 @@ export class FirebaseService {
     }
 
     /**
+     * Set new User in Firebase database
+     * @param user
+     * @private
+     */
+    _setUserInDB(user) {
+        return this._database.ref('/users/' + user.uid).set(user);
+    }
+
+    /**
      * Sign user in to Firebase
      * @param credentials
-     * @returns {Bluebird<R>}
+     * @returns {firebase.Promise<any>}
      */
     login(credentials) {
         console.log('User Credentials: LOGIN', credentials);
         return firebase.auth().signInWithEmailAndPassword(credentials.email, credentials.password)
             .then((authData) => {
                 console.log("Authenticated successfully with payload-", authData);
-                return {
-                    uid: authData.uid,
-                    token: authData.j,
-                    email: authData.email,
-                    username: authData.uid,
-                    firstname: authData.firstname,
-                    lastname: authData.lastname,
-                    expire: 1000000,
-                    tokenValid: true
-                };
+                return this._database.ref('/users/' + authData.uid).once('value').then((snapshot) => {
+                    console.log('SNAPSHOT AFTER LOGIN', snapshot.val());
+                    return snapshot.val();
+                });
             });
     }
+
+    /**
+     * Refresh User Token if it has expired
+     * @param user
+     * @returns {firebase.Promise<any>}
+     */
+    refreshUserToken(user) {
+        console.log(user.token);
+        return firebase.auth().currentUser.getToken(true).then((token) => {
+            user.token = token;
+            return this.updateUserInDB(user.uid, {token: user.token, expire: user.expire}).then(() => {
+                console.log(user.token);
+                return user;
+            });
+        });
+    }
+
+    /**
+     * Update User Token and Expiry in Firebase database
+     * @param uid
+     * @param updates
+     */
+    updateUserInDB(uid, updates = {}) {
+        return this._database.ref('/users/' + uid).update(updates);
+    }
+
+    /**
+     * Load All Graph data from Firebase database
+     * @param uid
+     */
+    // TODO: Add pagination, so that all data is not just loaded at once
+    loadGraphs(uid) {
+        return this._database.ref('/graphs/' + uid).on('value').then((snapshot) => {
+            console.log('SNAPSHOT AFTER LOGIN', snapshot.val());
+            return snapshot.val();
+        });
+    }
+
+    /**
+     * Load single graph data with unique Id from Firebase database
+     * @param uid
+     * @param graphId
+     */
+    loadGraph(uid, graphId) {
+        return this._database.ref('/graphs/' + uid + '/' + graphId).once('value').then((snapshot) => {
+            console.log('SNAPSHOT AFTER LOGIN', snapshot.val());
+            return snapshot.val();
+        });
+    }
+
+    /**
+     * Save Graph data to Firebase database
+     * @param uid
+     * @param graphId
+     * @param graph
+     */
+    saveGraph(uid, graphId, graph) {
+        return this._database.ref('/graphs/' + uid + '/' + graphId).set(graph);
+    }
+
+    /**
+     * Update Graph data in Firebase database
+     * @param uid
+     * @param graphId
+     * @param updates
+     */
+    updateGraph(uid, graphId, updates) {
+        return this._database.ref('/graphs/' + uid + '/' + graphId).update(updates);
+    }
+
+    /**
+     * Load All Rest data from Firebase database
+     * @param uid
+     */
+    loadRestfuls(uid) {
+        return this._database.ref('/rests/' + uid).on('value').then((snapshot) => {
+            console.log('SNAPSHOT AFTER LOGIN', snapshot.val());
+            return snapshot.val();
+        });
+    }
+
+    /**
+     * Load single rest data with unique Id from Firebase database
+     * @param uid
+     * @param restfulId
+     */
+    loadRestful(uid, restfulId) {
+        return this._database.ref('/rests/' + uid + '/' + restfulId).once('value').then((snapshot) => {
+            console.log('SNAPSHOT AFTER LOGIN', snapshot.val());
+            return snapshot.val();
+        });
+    }
+
+    /**
+     * Save Rest data to Firebase database
+     * @param uid
+     * @param restfulId
+     * @param rest
+     */
+    saveRestful(uid, restfulId, rest) {
+        return this._database.ref('/rests/' + uid + '/' + restfulId).set(rest);
+    }
+
+    /**
+     * Update Rest data in Firebase database
+     * @param uid
+     * @param restfulId
+     * @param updates
+     */
+    updateRestful(uid, restfulId, updates) {
+        return this._database.ref('/rests/' + uid + '/' + restfulId).update(updates);
+    }
+
 
     /**
      * Upload file from Local to Firebase Storage
@@ -135,7 +272,8 @@ export class FirebaseService {
 
     /**
      * Get all references from database
-     * @returns {void|any|Server}
+     * @param reference
+     * @returns {(a:(firebase.database.DataSnapshot|null), b?:string)=>any}
      */
     getDataObs(reference: string) {
         let ref = firebase.database().ref(reference);
@@ -151,8 +289,7 @@ export class FirebaseService {
             });
 
             return arr;
-        },
-        (error) => {
+        }, (error) => {
             console.log("ERROR:", error);
             return error;
         });
