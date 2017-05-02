@@ -21,10 +21,12 @@ import {ErrorService} from "../services/error.service";
 @NgModule({
     declarations: [
         Altfire.Entry,
-        Altfire.HomePage,
+        Altfire.HistoryPage,
         Altfire.TabsPage,
         Altfire.GraphqlPage,
         Altfire.RestfulPage,
+        Altfire.GraphPage,
+        Altfire.RestPage,
         Altfire.AuthPage,
         Altfire.SettingsPage,
         Altfire.SigninModal,
@@ -44,10 +46,12 @@ import {ErrorService} from "../services/error.service";
     bootstrap: [IonicApp],
     entryComponents: [
         Altfire.Entry,
-        Altfire.HomePage,
+        Altfire.HistoryPage,
         Altfire.TabsPage,
         Altfire.GraphqlPage,
         Altfire.RestfulPage,
+        Altfire.GraphPage,
+        Altfire.RestPage,
         Altfire.AuthPage,
         Altfire.SettingsPage,
         Altfire.SigninModal,

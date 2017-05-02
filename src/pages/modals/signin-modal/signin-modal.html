@@ -1,10 +1,12 @@
 <ion-content padding>
     <ion-grid style="padding-top: 50px;">
-        <ion-row>
-            <ion-img src="assets/robot.png" alt="Image goes here"></ion-img>
+        <ion-row align-items-center>
+            <div style="height: 200px; width: 200px; border-radius: 50%; overflow: hidden; display: flex;">
+                <ion-img src="assets/robot.png" alt="Image goes here"></ion-img>
+            </div>
         </ion-row>
         <ion-row>
-            <ion-item>
+            <ion-item no-lines text-center>
                 {{ user.firstname }} {{ user.lastname }}
             </ion-item>
         </ion-row>

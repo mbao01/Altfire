@@ -52,7 +52,18 @@ export class AuthPage {
      * Calls authentication service to sign user up
      */
     onSignup() {
-        this.authService.signup(this.f.value);
+        let loading = this.h.loader({msg: 'signing you in . . . ', dismissOnPageChange: true});
+        loading.present();
+        this.authService.signup(this.f.value).then((user) => {
+            console.log('Signed in: ', user);
+            this.authService.setUser(user);
+            this.onShowToast('Account Created Successfully');
+            this.onToggleAuth();
+            loading.dismiss();
+        }).catch((err) => {
+            this.logger.handleError(err);
+            loading.dismiss();
+        });
     }
 
     /**
@@ -61,20 +72,18 @@ export class AuthPage {
     onSignin() {
         let loading = this.h.loader({msg: 'signing you in . . . ', dismissOnPageChange: true});
         loading.present();
-        // FIXME: Fix signing in with invalid credentials
         this.authService.signin({ email: this.f.value.email, password: this.f.value.password }).then((user) => {
             console.log('Signed in: ', user);
             this.onShowToast('Signed in as ' + user.username);
             user.tokenValid = true;
             this.navCtrl.setRoot(TabsPage);
             this.authService.setUser(user);
-        }).catch((err) => {
-            // TODO: Add Error Stack Logger here and Add ALERT Here
             loading.dismiss();
+        }).catch((err) => {
             console.log('Signed in ERROR: ', err);
+            loading.dismissAll();
             this.h.alert(this.error.clean(err));
             this.logger.handleError(err);
-            // return err;
         });
     }
 

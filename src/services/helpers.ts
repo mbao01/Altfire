@@ -14,14 +14,14 @@ export class HelperService {
 
     /**
      * Alert Helper
+     * @param data
      */
     alert(data: any) {
         this.alertCtrl.create({
-            title: data.code ? data.code : 'ERROR',
-            subTitle: data.friendly ? data.friendly : '',
+            subTitle: data.code ? data.code : '',
             message: data.message ? data.message : '',
             enableBackdropDismiss: true
-        });
+        }).present();
     }
 
     /**
