@@ -7,6 +7,7 @@ export {ReqHeader} from "./request-header.model";
 export {ReqAuthorization} from "./request-authorization.model";
 
 export interface Rest {
+    id?: number;
     request_url?: string;
     request_type: string;
     request_body_type?: string;

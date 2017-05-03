@@ -7,7 +7,7 @@
     "clean": "ionic-app-scripts clean",
     "build": "ionic-app-scripts build",
     "parse": "nodemon server/app.js",
-    "ionic:build": "node copy-env-config.js --env env.prod | ionic-app-scripts build  --prod --release ",
+    "ionic:build": "node copy-env-config.js --env env.prod | ionic-app-scripts build --prod --release ",
     "ionic:serve": "node copy-env-config.js --env env.dev | ionic-app-scripts serve"
   },
   "repository": {

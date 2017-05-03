@@ -12,8 +12,6 @@ export class TabsPage {
     graphqlPage = GraphqlPage;
     restfulPage = RestfulPage;
 
-    count: { graph?: number, rest?: number };
-
     /**
      *
      * @param navCtrl
@@ -27,7 +25,6 @@ export class TabsPage {
      */
     ngOnInit() {
         console.log('ngOnInit Tabs');
-        this.count = this.navParams.data ? this.navParams.data : {};
     }
 
     /**

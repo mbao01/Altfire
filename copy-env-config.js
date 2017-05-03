@@ -20,7 +20,7 @@ wd.on('error', handleError);
 function handleError(err) {
     rd.destroy();
     wd.end();
-    console.error('There was an error while copying the environmemt configuration file:');
+    console.error('There was an error while copying the environment configuration file:');
     console.error(err);
 }
 

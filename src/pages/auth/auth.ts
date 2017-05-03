@@ -1,4 +1,4 @@
-import {Component, ErrorHandler} from '@angular/core';
+import {Component, ErrorHandler, OnInit} from '@angular/core';
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {AuthService} from "../../services/auth.service";
 import {TabsPage} from "../tabs/tabs";
@@ -11,11 +11,9 @@ import {ErrorService} from "../../services/error.service";
     selector: 'page-auth',
     templateUrl: 'auth.html',
 })
-export class AuthPage {
-    res: Object;
+export class AuthPage implements OnInit {
     f: FormGroup;
     auth_type: string = 'signup';
-    cpassword: string;
     user: User;
 
     /**
@@ -52,17 +50,18 @@ export class AuthPage {
      * Calls authentication service to sign user up
      */
     onSignup() {
-        let loading = this.h.loader({msg: 'signing you in . . . ', dismissOnPageChange: true});
+        let loading = this.h.loader({msg: 'signing you up . . . ', dismissOnPageChange: true});
         loading.present();
         this.authService.signup(this.f.value).then((user) => {
-            console.log('Signed in: ', user);
-            this.authService.setUser(user);
+            console.log('Signed up: ', user);
             this.onShowToast('Account Created Successfully');
             this.onToggleAuth();
             loading.dismiss();
         }).catch((err) => {
+            console.log('Signed in ERROR: ', err);
+            loading.dismissAll();
+            this.h.alert(this.error.clean(err));
             this.logger.handleError(err);
-            loading.dismiss();
         });
     }
 
@@ -74,10 +73,10 @@ export class AuthPage {
         loading.present();
         this.authService.signin({ email: this.f.value.email, password: this.f.value.password }).then((user) => {
             console.log('Signed in: ', user);
-            this.onShowToast('Signed in as ' + user.username);
+            this.onShowToast('Welcome, signed in as ' + user.username);
             user.tokenValid = true;
-            this.navCtrl.setRoot(TabsPage);
             this.authService.setUser(user);
+            this.navCtrl.setRoot(TabsPage);
             loading.dismiss();
         }).catch((err) => {
             console.log('Signed in ERROR: ', err);
@@ -147,8 +146,8 @@ export class AuthPage {
             lastname: new FormControl(params.data && params.data.lastname ? params.data.lastname : null, [Validators.required]),
             username: new FormControl(params.data && params.data.username ? params.data.username : null, [Validators.required]),
             email: new FormControl(params && params.data ? params.data.email : null, [Validators.required, Validators.email]),
-            password: new FormControl(null, [Validators.required]),
-            cpassword: new FormControl(params.data && params.data.cpassword ? params.data.cpassword : null, [Validators.required])
+            password: new FormControl(null, [Validators.required, Validators.minLength(6)]),
+            cpassword: new FormControl(params.data && params.data.cpassword ? params.data.cpassword : null, [Validators.required, Validators.minLength(6)])
         });
     }
 

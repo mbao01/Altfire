@@ -32,42 +32,43 @@ export class FirebaseService {
 
     /**
      * Get user authentication state from Firebase
-     * @returns {any}
+     * @returns {firebase.auth.Auth}
+     * @private
      */
-    auth() {
+    _auth() {
         return firebase.auth();
     }
 
     /**
-     * Get current user fro Firebase
-     * @returns {()=>()=>any}
+     * Get current user identity from Firebase
+     * @returns {string}
      */
     currentUserId() {
-        return firebase.auth().currentUser.uid;
+        return this._auth().currentUser.uid;
     }
 
     /**
      * Sign user out of Firebase
      */
     logout() {
-        firebase.auth().signOut();
+        this._auth().signOut();
     }
 
     /**
      * Create new User using EmailAndPassword method in Firebase
-     * @param credentials
+     * @param user
      * @returns {firebase.Thenable<any>}
      */
-    createEmailUser(credentials) {
-        return firebase.auth().createUserWithEmailAndPassword(credentials.email, credentials.password)
+    createEmailUser(user) {
+        return this._auth().createUserWithEmailAndPassword(user.email, user.password)
             .then((authData) => {
                 console.log("User created successfully with payload-", authData);
-                credentials['uid'] = authData.uid;
-                credentials['token'] = authData.Yd;
-                credentials['expire'] = new Date().getTime() + 100000;
-                delete credentials.password;
-                delete credentials.cpassword;
-                return this._setUserInDB(credentials).then(() => {
+                user['uid'] = authData.uid;
+                user['token'] = authData.Yd;
+                user['expire'] = new Date().getTime() + 864000;
+                delete user.password;
+                delete user.cpassword;
+                return this._setUserInDB(user).then(() => {
                     return {
                         uid: authData.uid,
                         token: null,
@@ -100,8 +101,7 @@ export class FirebaseService {
      * @returns {firebase.Promise<any>}
      */
     login(credentials) {
-        console.log('User Credentials: LOGIN', credentials);
-        return firebase.auth().signInWithEmailAndPassword(credentials.email, credentials.password)
+        return this._auth().signInWithEmailAndPassword(credentials.email, credentials.password)
             .then((authData) => {
                 console.log("Authenticated successfully with payload-", authData);
                 return this._database.ref('/users/' + authData.uid).once('value').then((snapshot) => {
@@ -118,7 +118,7 @@ export class FirebaseService {
      */
     refreshUserToken(user) {
         console.log(user.token);
-        return firebase.auth().currentUser.getToken(true).then((token) => {
+        return this._auth().currentUser.getToken(true).then((token) => {
             user.token = token;
             return this.updateUserInDB(user.uid, {token: user.token, expire: user.expire}).then(() => {
                 console.log(user.token);
@@ -256,7 +256,7 @@ export class FirebaseService {
                     ref.push({
                         'imageURL': downloadURL,
                         'thumb' : _imageData['thumb'],
-                        'owner': firebase.auth().currentUser.uid,
+                        'owner': this._auth().currentUser.uid,
                         'when': new Date().getTime(),
                         //'meta': _metadata
                     });
@@ -294,4 +294,5 @@ export class FirebaseService {
             return error;
         });
     }
+
 }

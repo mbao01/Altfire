@@ -190,6 +190,7 @@ export class StorageService {
      * @returns {Promise<any>}
      */
     setAltfireApp() {
+        // TODO: Find a hash encryption mechanism, encrypt device type, device name, OS type as argument.
         const appId = '';
         return this.setItemInNStorage('altfire', { appId: appId });
     }

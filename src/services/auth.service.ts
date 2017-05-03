@@ -28,7 +28,7 @@ export class AuthService {
      * Checks User Authentication State
      */
     auth() {
-        this.firebaseService.auth().onAuthStateChanged((_currentUser) => {
+        this.firebaseService._auth().onAuthStateChanged((_currentUser) => {
             if (_currentUser) {
                 this.user.tokenValid = true;
             } else {

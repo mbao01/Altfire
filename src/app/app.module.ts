@@ -28,7 +28,6 @@ import {ErrorService} from "../services/error.service";
         Altfire.GraphPage,
         Altfire.RestPage,
         Altfire.AuthPage,
-        Altfire.SettingsPage,
         Altfire.SigninModal,
         Altfire.RequestHeaderComponent,
         Altfire.RequestBodyComponent,
@@ -53,7 +52,6 @@ import {ErrorService} from "../services/error.service";
         Altfire.GraphPage,
         Altfire.RestPage,
         Altfire.AuthPage,
-        Altfire.SettingsPage,
         Altfire.SigninModal,
         Altfire.PopoverComponent
     ],
