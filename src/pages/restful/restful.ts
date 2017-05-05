@@ -27,15 +27,15 @@ export class RestfulPage {
     request_body_detail: (number | boolean)[] = [0, false];
     request_auth_set: boolean = false;
     bareminimun: string =
-    `   
-    # Welcome to Altfire RESTful API Client
-    #
-    # Altfire is a mobile IDE for writing, validating, and
-    # testing RESTful APIs and GraphQL queries.
-    #
-    # Press the play button below to send the request, and the result
-    # will appear HERE automatically.    
-    `;
+`   
+  # Welcome to Altfire RESTful API Client
+  #
+  # Altfire is a mobile IDE for writing, validating, and
+  # testing RESTful APIs and GraphQL queries.
+  #
+  # Press the play button below to send the request, and the result
+  # will appear HERE automatically.    
+`;
     rest: Rest = this.restfulService.getRest();
 
     /**

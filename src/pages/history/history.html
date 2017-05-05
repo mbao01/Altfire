@@ -1,11 +1,21 @@
 <ion-header>
+
   <ion-navbar>
-    <ion-title>
-      Saved List
-    </ion-title>
+    <ion-buttons left>
+      <button ion-button icon-only menuToggle>
+        <ion-icon name="menu" color="primary"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-title> History </ion-title>
   </ion-navbar>
+
 </ion-header>
 
 <ion-content padding>
-  All - Filter By Type, Sort By Date, Asc or Desc
+  <ion-list>
+    <button ion-item *ngFor="let d of data, let i=index" (click)="onLoadData(i, d)">
+      <h2>{{ d.title }}</h2>
+      <ion-note>{{ d.difficulty }}</ion-note>
+    </button>
+  </ion-list>
 </ion-content>

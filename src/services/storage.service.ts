@@ -18,52 +18,6 @@ export class StorageService {
     }
 
     /**
-     * Get Item from Native Storage
-     * @param ref
-     * @returns {Promise<any>}
-     */
-    getItemInNStorage(ref) {
-        return this.nativeStorage.getItem(ref);
-    }
-
-    /**
-     * Set Item in Native Storage
-     * @param ref
-     * @param data
-     * @returns {Promise<any>}
-     */
-    setItemInNStorage(ref, data) {
-        return this.nativeStorage.setItem(ref, data);
-    }
-
-    /**
-     * Clear Native Storage
-     * @returns {Promise<any>}
-     */
-    clearNStorage() {
-        return this.nativeStorage.clear();
-    }
-
-    /**
-     * Update Item from Native Storage
-     * @param ref
-     * @param data
-     * @returns {Promise<any>}
-     */
-    updateItemInNStorage(ref, data) {
-        return this.nativeStorage.clear();
-    }
-
-    /**
-     * Delete Item from Native Storage
-     * @param ref
-     * @returns {Promise<any>}
-     */
-    deleteItemInNStorage(ref) {
-        return this.nativeStorage.remove(ref);
-    }
-
-    /**
      * Get Item from LocalStorage
      * @param key
      * @returns {Promise<any>}
@@ -112,7 +66,7 @@ export class StorageService {
      * @returns {Promise<any>}
      */
     getUser() {
-        return this.getItemInNStorage('user');
+        return this.getItemInStorage('user');
     }
 
     /**
@@ -121,7 +75,7 @@ export class StorageService {
      * @returns {Promise<any>}
      */
     setUser(data) {
-        return this.setItemInNStorage('user', data).then((user) => {
+        return this.setItemInStorage('user', data).then((user) => {
             return user;
         });
     }
@@ -131,7 +85,7 @@ export class StorageService {
      * @returns {Promise<any>}
      */
     removeUser() {
-        return this.deleteItemInNStorage('user');
+        return this.deleteItemInStorage('user');
     }
 
     /**
@@ -182,7 +136,7 @@ export class StorageService {
      * @returns {Promise<any>}
      */
     getAltfireApp() {
-        return this.getItemInNStorage('altfire');
+        return this.getItemInStorage('altfire');
     }
 
     /**
@@ -192,7 +146,7 @@ export class StorageService {
     setAltfireApp() {
         // TODO: Find a hash encryption mechanism, encrypt device type, device name, OS type as argument.
         const appId = '';
-        return this.setItemInNStorage('altfire', { appId: appId });
+        return this.setItemInStorage('altfire', { appId: appId });
     }
 
     /**

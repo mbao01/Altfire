@@ -142,7 +142,7 @@ export class FirebaseService {
      */
     // TODO: Add pagination, so that all data is not just loaded at once
     loadGraphs(uid) {
-        return this._database.ref('/graphs/' + uid).on('value').then((snapshot) => {
+        return this._database.ref('/data/graphs/' + uid).on('value').then((snapshot) => {
             console.log('SNAPSHOT AFTER LOGIN', snapshot.val());
             return snapshot.val();
         });
@@ -154,7 +154,7 @@ export class FirebaseService {
      * @param graphId
      */
     loadGraph(uid, graphId) {
-        return this._database.ref('/graphs/' + uid + '/' + graphId).once('value').then((snapshot) => {
+        return this._database.ref('/data/graphs/' + uid + '/' + graphId).once('value').then((snapshot) => {
             console.log('SNAPSHOT AFTER LOGIN', snapshot.val());
             return snapshot.val();
         });
@@ -167,7 +167,7 @@ export class FirebaseService {
      * @param graph
      */
     saveGraph(uid, graphId, graph) {
-        return this._database.ref('/graphs/' + uid + '/' + graphId).set(graph);
+        return this._database.ref('/data/graphs/' + uid + '/' + graphId).set(graph);
     }
 
     /**
@@ -177,7 +177,7 @@ export class FirebaseService {
      * @param updates
      */
     updateGraph(uid, graphId, updates) {
-        return this._database.ref('/graphs/' + uid + '/' + graphId).update(updates);
+        return this._database.ref('/data/graphs/' + uid + '/' + graphId).update(updates);
     }
 
     /**
@@ -185,7 +185,7 @@ export class FirebaseService {
      * @param uid
      */
     loadRestfuls(uid) {
-        return this._database.ref('/rests/' + uid).on('value').then((snapshot) => {
+        return this._database.ref('/data/rests/' + uid).on('value').then((snapshot) => {
             console.log('SNAPSHOT AFTER LOGIN', snapshot.val());
             return snapshot.val();
         });
@@ -197,7 +197,7 @@ export class FirebaseService {
      * @param restfulId
      */
     loadRestful(uid, restfulId) {
-        return this._database.ref('/rests/' + uid + '/' + restfulId).once('value').then((snapshot) => {
+        return this._database.ref('/data/rests/' + uid + '/' + restfulId).once('value').then((snapshot) => {
             console.log('SNAPSHOT AFTER LOGIN', snapshot.val());
             return snapshot.val();
         });
@@ -210,7 +210,7 @@ export class FirebaseService {
      * @param rest
      */
     saveRestful(uid, restfulId, rest) {
-        return this._database.ref('/rests/' + uid + '/' + restfulId).set(rest);
+        return this._database.ref('/data/rests/' + uid + '/' + restfulId).set(rest);
     }
 
     /**
@@ -220,7 +220,7 @@ export class FirebaseService {
      * @param updates
      */
     updateRestful(uid, restfulId, updates) {
-        return this._database.ref('/rests/' + uid + '/' + restfulId).update(updates);
+        return this._database.ref('/data/rests/' + uid + '/' + restfulId).update(updates);
     }
 
 

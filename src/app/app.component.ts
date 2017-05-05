@@ -78,33 +78,35 @@ export class Entry implements OnInit {
         this.storageService.renderData();
         this.storageService.getAltfireApp().then(() => {
             this.storageService.getUser().then((user: User) => {
-                if(user.uid && user.token && user.expire > currentTime) {
-                    this.showToast('Welcome back ' + user.username + ', missed you!');
-                    user.tokenValid = true;
-                    // TODO: Check if there's a way to update data in LocalStorage for Ionic
-                    this.authService.setUser(user);
-                    this.nav.setRoot(TabsPage);
-                } else if (user.uid && user.token && user.expire <= currentTime) {
-                    // TODO: Is the logic below necessary??
-                    this.h.loader({msg: 'signing you in . . .'});
-                    let modal = this.modalCtrl.create(this.signinModal, user);
-                    modal.onDidDismiss((signinAs) => {
-                        if(signinAs && signinAs == 'olduser') {
-                            user.tokenValid = true;
-                            this.showToast('Logged in as ' + user.username);
-                            this.authService.setUser(user);
-                            this.nav.setRoot(TabsPage);
-                        } else {
-                            this.storageService.deleteToken().then(() => {
-                                user.tokenValid = false;
-                                this.showToast('please signin to save your work');
-                                this.nav.setRoot(this.authPage, {auth_type: 'signin', data: this._initInput(user)});
-                            }).catch((err) => {
-                                this.logger.handleError(err);
-                            });
-                        }
-                    });
-                    modal.present();
+                if(user && user.uid && user.token ){
+                    if(user.expire > currentTime) {
+                        this.showToast('Welcome back ' + user.username + ', missed you!');
+                        user.tokenValid = true;
+                        // TODO: Check if there's a way to update data in LocalStorage for Ionic
+                        this.authService.setUser(user);
+                        this.nav.setRoot(TabsPage);
+                    } else {
+                        // TODO: Is the logic below necessary??
+                        this.h.loader({msg: 'signing you in . . .'});
+                        let modal = this.modalCtrl.create(this.signinModal, user);
+                        modal.onDidDismiss((signinAs) => {
+                            if (signinAs && signinAs == 'olduser') {
+                                user.tokenValid = true;
+                                this.showToast('Logged in as ' + user.username);
+                                this.authService.setUser(user);
+                                this.nav.setRoot(TabsPage);
+                            } else {
+                                this.storageService.deleteToken().then(() => {
+                                    user.tokenValid = false;
+                                    this.showToast('please signin to save your work');
+                                    this.nav.setRoot(this.authPage, {auth_type: 'signin', data: this._initInput(user)});
+                                }).catch((err) => {
+                                    this.logger.handleError(err);
+                                });
+                            }
+                        });
+                        modal.present();
+                    }
                 } else {
                     this.nav.setRoot(this.authPage, { auth_type: 'signin', data: this._initInput(user)});
                 }

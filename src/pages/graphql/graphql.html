@@ -45,7 +45,7 @@
         <ion-grid *ngIf="state != 'response'">
             <ion-row>
                 <ion-col>
-                    <textarea [placeholder]="bareminimun" (blur)="graph.endpoint ? onSetQuery(query) : ''" [(ngModel)]="query"></textarea>
+                    <textarea [placeholder]="bareminimun" (blur)="graph.endpoint ? onSetQuery(query) : ''" [(ngModel)]="query" style=""></textarea>
                 </ion-col>
             </ion-row>
         </ion-grid>
