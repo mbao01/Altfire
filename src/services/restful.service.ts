@@ -127,6 +127,23 @@ export class RestfulService {
         return this.http.delete(rest.request_url, this._flattenBody(rest.request_body, rest.request_body_type)).toPromise();
     }
 
+    method(request_type: string, rest: Rest) {
+        switch (request_type) {
+            case 'get':
+                return this.get(rest);
+            case 'post':
+                return this.post(rest);
+            case 'put':
+                return this.put(this.rest);
+            case 'patch':
+                return this.patch(this.rest);
+            case 'delete':
+                return this.delete(this.rest);
+            default:
+                return this.get(rest);
+        }
+    }
+
     /**
      * Return valid attributes based on checked status
      * @param array

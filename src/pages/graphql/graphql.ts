@@ -1,5 +1,5 @@
-import {Component} from '@angular/core';
-import {AlertController, NavController, PopoverController} from 'ionic-angular';
+import {Component, ErrorHandler} from '@angular/core';
+import {AlertController, NavController, Platform, PopoverController} from 'ionic-angular';
 import {GraphqlHTTPClient} from "../../services/graphql.service";
 import {Graph} from "../../models/graphql/graphql.model";
 import {GraphHeader} from "../../models/graphql/graphql-header.model";
@@ -21,6 +21,7 @@ export class GraphqlPage {
     header_detail: (number | boolean)[];
     response_valid: boolean;
     state: string = '';
+    hideHeader = false;
     bareminimun: String =
 `   
     # Welcome to Altfire GraphiQL Client
@@ -53,7 +54,9 @@ export class GraphqlPage {
         private graphqlService: GraphqlHTTPClient,
         private authService: AuthService,
         private storageService: StorageService,
-        private h: HelperService) { }
+        private h: HelperService,
+        private logger: ErrorHandler,
+        private _platform: Platform) { }
 
     /**
      * TODO: DELETE
@@ -66,6 +69,11 @@ export class GraphqlPage {
      * Initialize last Graph query and User data
      */
     ngOnInit() {
+        if(this._platform.isLandscape()) {
+            this.hideHeader = true;
+        } else {
+            this.hideHeader = false;
+        }
         this.graph = this.graphqlService.getGraph();
         this.user = this.authService.getUser();
     }
@@ -126,7 +134,7 @@ export class GraphqlPage {
                 this.onSuccess(data);
                 loading.dismiss();
             }).catch((err) => {
-                console.log(err);
+                this.logger.handleError(err);
                 this.onFailure(err);
                 loading.dismiss();
             });

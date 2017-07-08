@@ -1,4 +1,4 @@
-import {Component, ViewChild} from '@angular/core';
+import {Component, ErrorHandler, OnInit, ViewChild} from '@angular/core';
 import {ModalController, NavController, Platform} from 'ionic-angular';
 import {StatusBar} from '@ionic-native/status-bar';
 import {SplashScreen} from '@ionic-native/splash-screen';
@@ -12,12 +12,14 @@ import {StorageService} from "../services/storage.service";
 import {SigninModal} from "../pages/modals/signin-modal/signin-modal";
 import {HelperService} from "../services/helpers";
 
-export {HomePage} from '../pages/home/home';
 export {TabsPage} from '../pages/tabs/tabs';
 export {GraphqlPage} from '../pages/graphql/graphql';
 export {RestfulPage} from '../pages/restful/restful';
 export {AuthPage} from '../pages/auth/auth';
 export {SettingsPage} from '../pages/settings/settings';
+export {HistoryPage} from '../pages/history/history';
+export {GraphPage} from '../pages/history/graph/graph';
+export {RestPage} from '../pages/history/rest/rest';
 
 export {MethodsComponent} from '../components/methods';
 export {RequestHeaderComponent} from '../components/header';
@@ -29,7 +31,7 @@ export {SigninModal} from '../pages/modals/signin-modal/signin-modal';
 @Component({
     templateUrl: 'app.html'
 })
-export class Entry {
+export class Entry implements OnInit {
     private _date = new Date();
     authPage = AuthPage;
     settingsPage = SettingsPage;
@@ -38,24 +40,29 @@ export class Entry {
 
     /**
      * Application Entry Component Constructor
-     * @param platform
-     * @param statusBar
-     * @param splashScreen
+     * @param _platform
+     * @param _statusBar
+     * @param _splashScreen
      * @param modalCtrl
      * @param authService
      * @param storageService
      * @param h
      */
-    constructor(platform: Platform,
-                statusBar: StatusBar,
-                splashScreen: SplashScreen,
+    constructor(private _platform: Platform,
+                private _statusBar: StatusBar,
+                private _splashScreen: SplashScreen,
                 private modalCtrl: ModalController,
                 private authService: AuthService,
                 private storageService: StorageService,
-                private h: HelperService) {
-        platform.ready().then(() => {
-            statusBar.styleDefault();
-            splashScreen.hide();
+                private h: HelperService,
+                private logger: ErrorHandler) {
+        this._initializeApp();
+    }
+
+    _initializeApp() {
+        this._platform.ready().then(() => {
+            this._statusBar.styleDefault();
+            this._splashScreen.hide();
         });
     }
 
@@ -64,22 +71,19 @@ export class Entry {
      * ngOnInit lifecycle hook
      */
     ngOnInit() {
-        console.log('Initializing MENU');
+        let currentTime = this._date.getTime();
         this.storageService.renderData();
         this.storageService.getAltfireApp().then((data) => {
-            console.log('Altfire App Id: SUCCESS', data);
             this.storageService.getUser().then((user: User) => {
-                console.log('User in Secure Storage: SUCCESS', user);
-                if(user.token && user.expire > this._date.getTime()) {
+                if(user.token && user.expire > currentTime) {
                     user.tokenValid = true;
                     this.authService.setUser(user);
                     this.nav.setRoot(TabsPage);
-                } else if (user.token && user.expire <= this._date.getTime()) {
+                } else if (user.token && user.expire <= currentTime) {
                     this.h.loader({msg: 'signing you in . . .'});
                     let modal = this.modalCtrl.create(SigninModal, user);
                     modal.onDidDismiss((data) => {
                         if(data && data == 'continue') {
-                            // TODO: Try to send refresh token to firebase to refresh user token
                             user.tokenValid = true;
                             this.onShowToast('Logged in as ' + user.username);
                             this.authService.setUser(user);
@@ -88,6 +92,8 @@ export class Entry {
                                 user.tokenValid = false;
                                 this.onShowToast('please signin to save your work');
                                 this.nav.setRoot(this.authPage, {auth_type: 'signin', data: this._initInput(user)});
+                            }).catch((err) => {
+                                this.logger.handleError(err);
                             });
                         }
                     });
@@ -95,11 +101,12 @@ export class Entry {
                 } else {
                     this.nav.setRoot(this.authPage, { auth_type: 'signin', data: this._initInput(user)});
                 }
-            }).catch(() => {
+            }).catch((err) => {
+                this.logger.handleError(err);
                 this.nav.setRoot(this.authPage, { auth_type: 'signup', data: {} });
             });
         }).catch((err) => {
-            console.log('Error from either Altfire Id or User: ERROR', err);
+            this.logger.handleError(err);
             this.nav.setRoot(this.authPage, { auth_type: 'signup', data: {} });
             this.storageService.setAltfireApp().then();
         });

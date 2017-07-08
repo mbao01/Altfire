@@ -158,40 +158,36 @@
     </ion-grid>
 
     <ion-grid no-lines *ngIf="segment == 'summary'" class="summary">
-        <ion-row no-padding no-margin no-border *ngIf="rest.response">
-            <ion-item-group>
-                <ion-item-divider color="light">{{ rest.request_type | uppercase}}</ion-item-divider>
-                <ion-item>{{ rest.request_url }}</ion-item>
-            </ion-item-group>
-            <ion-item-group>
-                <ion-item-divider color="light" *ngIf="rest.request_header">Header</ion-item-divider>
-                <ion-item *ngFor="let header of rest.request_header">
-                    <ion-col col-4>{{ header.key }}</ion-col>
-                    <ion-col col-8>{{ header.value }}</ion-col>
-                </ion-item>
-            </ion-item-group>
-            <ion-item-group *ngIf="rest.request_body && rest.request_type != 'get'">
-                <ion-item-divider color="light">Body: &nbsp;&nbsp;&nbsp;{{ rest.request_body_type }}</ion-item-divider>
-                <ion-item *ngFor="let body of rest.request_body">
-                    <ion-col col-4>{{ body.key }}</ion-col>
-                    <ion-col col-8>{{ body.value }}</ion-col>
-                </ion-item>
-            </ion-item-group>
-            <ion-item-group>
-                <ion-item-divider color="light">Authentication: &nbsp;&nbsp;&nbsp;{{ rest.request_authorization_type | uppercase }}</ion-item-divider>
-            </ion-item-group>
-            <ion-item-group *ngIf="rest?.response">
-                <ion-item-divider color="secondary"> Response </ion-item-divider>
-                <ion-col>
-                    <code><ion-textarea readonly value="{{ rest?.response ? (rest?.response | json) : '' }}"></ion-textarea></code>
-                </ion-col>
-            </ion-item-group>
-        </ion-row>
-
-        <ion-row *ngIf="!rest.response">
-            No REST Response
-        </ion-row>
-
+        <ion-item-group>
+            <ion-item-divider color="light">{{ rest.request_type | uppercase}}</ion-item-divider>
+            <ion-item>{{ rest.request_url }}</ion-item>
+        </ion-item-group>
+        <ion-item-group>
+            <ion-item-divider color="light" *ngIf="rest.request_header">Header</ion-item-divider>
+            <ion-item *ngFor="let header of rest.request_header">
+                <ion-col col-4>{{ header.key }}</ion-col>
+                <ion-col col-8>{{ header.value }}</ion-col>
+            </ion-item>
+        </ion-item-group>
+        <ion-item-group *ngIf="rest.request_body && rest.request_type != 'get'">
+            <ion-item-divider color="light">Body: &nbsp;&nbsp;&nbsp;{{ rest.request_body_type }}</ion-item-divider>
+            <ion-item *ngFor="let body of rest.request_body">
+                <ion-col col-4>{{ body.key }}</ion-col>
+                <ion-col col-8>{{ body.value }}</ion-col>
+            </ion-item>
+        </ion-item-group>
+        <ion-item-group>
+            <ion-item-divider color="light">Authentication: &nbsp;&nbsp;&nbsp;{{ rest.request_authorization_type | uppercase }}</ion-item-divider>
+        </ion-item-group>
+        <ion-item-group >
+            <ion-item-divider color="secondary"> Response </ion-item-divider>
+            <ion-col *ngIf="rest.response" col-12>
+                <pre><code>{{ rest?.response ? (rest?.response | json) : '' }}</code></pre>
+            </ion-col>
+            <ion-col *ngIf="!rest.response" col-12>
+                No REST Response Yet
+            </ion-col>
+        </ion-item-group>
     </ion-grid>
 
 </ion-content>

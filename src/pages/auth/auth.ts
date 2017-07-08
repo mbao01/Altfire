@@ -1,10 +1,11 @@
-import {Component} from '@angular/core';
+import {Component, ErrorHandler} from '@angular/core';
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {AuthService} from "../../services/auth.service";
 import {TabsPage} from "../tabs/tabs";
 import {User} from "../../models/user.model";
 import {NavController, NavParams} from "ionic-angular";
 import {HelperService} from "../../services/helpers";
+import {ErrorService} from "../../services/error.service";
 
 @Component({
     selector: 'page-auth',
@@ -23,11 +24,15 @@ export class AuthPage {
      * @param navParams
      * @param authService
      * @param h
+     * @param logger
+     * @param error
      */
     constructor(public navCtrl: NavController,
                 public navParams: NavParams,
                 private authService: AuthService,
-                private h: HelperService) {}
+                private h: HelperService,
+                private logger: ErrorHandler,
+                private error: ErrorService) {}
 
     /**
      * TODO: DELETE
@@ -47,22 +52,38 @@ export class AuthPage {
      * Calls authentication service to sign user up
      */
     onSignup() {
-        this.authService.signup(this.f.value);
+        let loading = this.h.loader({msg: 'signing you in . . . ', dismissOnPageChange: true});
+        loading.present();
+        this.authService.signup(this.f.value).then((user) => {
+            console.log('Signed in: ', user);
+            this.authService.setUser(user);
+            this.onShowToast('Account Created Successfully');
+            this.onToggleAuth();
+            loading.dismiss();
+        }).catch((err) => {
+            this.logger.handleError(err);
+            loading.dismiss();
+        });
     }
 
     /**
      * Calls authentication service to sign user in
      */
     onSignin() {
-        this.h.loader({msg: 'signing you in . . . ', dismissOnPageChange: true}).present();
-        // FIXME: Fix signing in with invalid credentials
+        let loading = this.h.loader({msg: 'signing you in . . . ', dismissOnPageChange: true});
+        loading.present();
         this.authService.signin({ email: this.f.value.email, password: this.f.value.password }).then((user) => {
+            console.log('Signed in: ', user);
             this.onShowToast('Signed in as ' + user.username);
             user.tokenValid = true;
             this.navCtrl.setRoot(TabsPage);
             this.authService.setUser(user);
-        }, err => {
-            return err;
+            loading.dismiss();
+        }).catch((err) => {
+            console.log('Signed in ERROR: ', err);
+            loading.dismissAll();
+            this.h.alert(this.error.clean(err));
+            this.logger.handleError(err);
         });
     }
 

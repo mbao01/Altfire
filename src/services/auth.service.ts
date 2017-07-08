@@ -1,5 +1,4 @@
-import {Injectable} from "@angular/core";
-import {Http} from "@angular/http";
+import {ErrorHandler, Injectable} from "@angular/core";
 import {StorageService} from "./storage.service";
 import {FirebaseService} from "./firebase.service";
 import {User} from "../models/user.model";
@@ -13,13 +12,16 @@ export class AuthService {
         email: ''
     };
 
+    private _date = new Date();
+
     /**
      * Authentication Service Constructor
      * @param http
      * @param storageService
      * @param firebaseService
+     * @param logger
      */
-    constructor(private http: Http, private storageService: StorageService, private firebaseService: FirebaseService) {
+    constructor(private storageService: StorageService, private firebaseService: FirebaseService, private logger: ErrorHandler) {
     }
 
     /**
@@ -41,6 +43,10 @@ export class AuthService {
      * @param user
      */
     setUser(user) {
+        if(user.expire < this._date.getTime()) {
+            user.expire = this._date.getTime() + 864000;
+            user = this.firebaseService.refreshUserToken(user) || user;
+        }
         this.user = user;
         this.storageService.setUser(user);
     }
@@ -60,13 +66,15 @@ export class AuthService {
         this.storageService.removeUser().then(() => {
             this.user.tokenValid = false;
             this.firebaseService.logout();
+        }).catch((err) => {
+            this.logger.handleError(err);
         });
     }
 
     /**
      * Sign user in Firebase
      * @param data
-     * @returns {Bluebird<R>}
+     * @returns {firebase.Promise<any>}
      */
     signin(data) {
         return this.firebaseService.login(data);
@@ -75,73 +83,10 @@ export class AuthService {
     /**
      * Sign user up in Firebase
      * @param user
+     * @returns {firebase.Thenable<any>}
      */
     signup(user) {
-        this.firebaseService.createEmailUser(user).then(() => {
-            this.setUser(user);
-        });
-    }
-
-    /**
-     * Load All Graph data from Firebase database
-     */
-    loadGraphs() {
-
-    }
-
-    /**
-     * Load single graph data with unique Id from Firebase database
-     * @param graphId
-     */
-    loadGraph(graphId) {
-
-    }
-
-    /**
-     * Save Graph data to Firebase database
-     * @param graphId
-     */
-    saveGraph(graphId) {
-
-    }
-
-    /**
-     * Update Graph data in Firebase database
-     * @param graphId
-     */
-    updateGraph(graphId) {
-
-    }
-
-    /**
-     * Load All Rest data from Firebase database
-     */
-    loadRestfuls() {
-
-    }
-
-    /**
-     * Load single rest data with unique Id from Firebase database
-     * @param restfulId
-     */
-    loadRestful(restfulId) {
-
-    }
-
-    /**
-     * Save Rest data to Firebase database
-     * @param restfulId
-     */
-    saveRestful(restfulId) {
-
-    }
-
-    /**
-     * Update Rest data in Firebase database
-     * @param restfulId
-     */
-    updateRestful(restfulId) {
-
+        return this.firebaseService.createEmailUser(user);
     }
 
 }

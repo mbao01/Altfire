@@ -1,6 +1,6 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {ErrorHandler, NgModule} from '@angular/core';
-import {IonicApp, IonicErrorHandler, IonicModule} from 'ionic-angular';
+import {IonicApp, IonicModule} from 'ionic-angular';
 import {SplashScreen} from '@ionic-native/splash-screen';
 import {StatusBar} from '@ionic-native/status-bar';
 import {HttpModule} from '@angular/http';
@@ -15,21 +15,26 @@ import {NativeStorage} from "@ionic-native/native-storage";
 import {StorageService} from "../services/storage.service";
 import {FirebaseService} from "../services/firebase.service";
 import {HelperService} from "../services/helpers";
+import {RavenErrorHandler} from "../services/sentry.service";
+import {ErrorService} from "../services/error.service";
 
 @NgModule({
     declarations: [
         Altfire.Entry,
-        Altfire.HomePage,
+        Altfire.HistoryPage,
         Altfire.TabsPage,
         Altfire.GraphqlPage,
         Altfire.RestfulPage,
+        Altfire.GraphPage,
+        Altfire.RestPage,
         Altfire.AuthPage,
         Altfire.SettingsPage,
         Altfire.SigninModal,
         Altfire.RequestHeaderComponent,
         Altfire.RequestBodyComponent,
         Altfire.RequestAuthorizationComponent,
-        Altfire.PopoverComponent
+        Altfire.PopoverComponent,
+        Altfire.MethodsComponent
     ],
     imports: [
         BrowserModule,
@@ -41,10 +46,12 @@ import {HelperService} from "../services/helpers";
     bootstrap: [IonicApp],
     entryComponents: [
         Altfire.Entry,
-        Altfire.HomePage,
+        Altfire.HistoryPage,
         Altfire.TabsPage,
         Altfire.GraphqlPage,
         Altfire.RestfulPage,
+        Altfire.GraphPage,
+        Altfire.RestPage,
         Altfire.AuthPage,
         Altfire.SettingsPage,
         Altfire.SigninModal,
@@ -53,7 +60,8 @@ import {HelperService} from "../services/helpers";
     providers: [
         StatusBar,
         SplashScreen,
-        {provide: ErrorHandler, useClass: IonicErrorHandler},
+        {provide: ErrorHandler, useClass: RavenErrorHandler},
+        ErrorService,
         RestfulService,
         GraphqlHTTPClient,
         AuthService,

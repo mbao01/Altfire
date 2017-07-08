@@ -6,7 +6,6 @@ import {RestfulService} from "./restful.service";
 
 @Injectable()
 export class StorageService {
-    private _date = new Date();
 
     /**
      * Storage Service Constructor
@@ -119,10 +118,9 @@ export class StorageService {
     /**
      * Set User in NativeStorage
      * @param data
-     * @returns {Promise<TResult|any>|Promise<TResult2|TResult1>|Promise<any>|Promise<TResult>}
+     * @returns {Promise<any>}
      */
     setUser(data) {
-        data.expire = this._date.getTime() + 864000;
         return this.setItemInNStorage('user', data).then((user) => {
             return user;
         });
@@ -138,7 +136,7 @@ export class StorageService {
 
     /**
      * Delete User Token
-     * @returns {Promise<TResult|any>|Promise<TResult2|TResult1>|Promise<any>|Promise<TResult>}
+     * @returns {Promise<any>}
      */
     deleteToken() {
         return this.getUser().then((user) => {

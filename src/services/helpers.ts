@@ -14,11 +14,14 @@ export class HelperService {
 
     /**
      * Alert Helper
+     * @param data
      */
-    alert() {
+    alert(data: any) {
         this.alertCtrl.create({
-
-        })
+            subTitle: data.code ? data.code : '',
+            message: data.message ? data.message : '',
+            enableBackdropDismiss: true
+        }).present();
     }
 
     /**
@@ -43,10 +46,14 @@ export class HelperService {
      */
     loader(opts?: {msg?: string, delay?: number, spinner?: string; dismissOnPageChange?: boolean}) {
         return this.loadingCtrl.create({
-            content: opts.msg ? opts.msg : ' Recieving.',
+            content: opts.msg ? opts.msg : ' Receiving.',
             delay: 500,
             spinner: opts.spinner ? opts.spinner : 'crescent',
             dismissOnPageChange: !!opts.dismissOnPageChange
         });
+    }
+
+    dismissLoader() {
+        console.log('This is Very Fresh');
     }
 }
